@@ -2,12 +2,17 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
-const SignInPage = () => {
+
+const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  const router = useRouter();
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -16,23 +21,18 @@ const SignInPage = () => {
       setLoading(true);
       setMessage(null);
 
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+      const result = await signIn('Credentials', {
+        username,
+        password,
+        redirect: false,
       });
 
-      const data = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        setMessage(
-          (data && (data.message || data.error)) ||
-            'เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'
-        );
-        return;
+      if (result?.error) {
+        setMessage('Invalid credentials');
       }
 
       setMessage('สำเร็จ');
+      router.push('/dashboard');
     } catch {
       setMessage('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
     } finally {
@@ -49,7 +49,7 @@ const SignInPage = () => {
         <div className="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-4 py-12">
           <div className="w-full max-w-md">
             <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-10">
-              <div className="text-sm font-semibold text-slate-500">Sign in</div>
+              <div className="text-sm font-semibold text-slate-500">Login</div>
               <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900">
                 เข้าสู่ระบบ
               </h1>
@@ -125,10 +125,20 @@ const SignInPage = () => {
                   {loading ? 'กำลังดำเนินการ...' : 'เข้าสู่ระบบ'}
                 </button>
 
+                <div className="text-right text-xs text-slate-500">
+                  ยังไม่มีบัญชี?{' '}
+                  <Link
+                    href="/register"
+                    className="font-semibold text-slate-700 hover:text-slate-900"
+                  >
+                    สมัครสมาชิก
+                  </Link>
+                </div>
+
                 <div className="text-center text-xs text-slate-500">
                   กลับหน้า{' '}
                   <Link
-                    href="/#home"
+                    href="/"
                     className="font-semibold text-slate-700 hover:text-slate-900"
                   >
                     Home
@@ -142,4 +152,4 @@ const SignInPage = () => {
     </div>
   );
 };
-export default SignInPage
+export default LoginPage

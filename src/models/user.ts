@@ -9,7 +9,23 @@ const userSchema = new mongoose.Schema({
   password: { 
     type: String, 
     required: true,
-  }
+  },
+  email: {
+    type: String,
+  },
+  role: {
+    type: String,
+    enum: ['ADMIN', 'USER'],
+    default: 'USER',
+  },
+  status: {
+    type: String,
+    enum: ['ACTIVE', 'INACTIVE'],
+    default: 'ACTIVE',
+  },
+  line_user_id: {
+    type: String,
+  },
 }, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);

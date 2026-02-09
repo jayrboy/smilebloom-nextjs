@@ -11,9 +11,16 @@ export async function POST(request: Request) {
   const hashedPassword = await bcrypt.hash(password, 10);
   try {
     await connectMongoDB();
+
+    const userExists = await User.findOne({ username });
+    if (userExists) {
+      return NextResponse.json({ message: 'User already exists' }, { status: 404 });
+    }
+
     const user = await User.create({ username, password: hashedPassword });
     return NextResponse.json(user);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
+    console.log('error:', error);
+    return NextResponse.json({ message: 'Failed to create user' }, { status: 500 });
   }
 }
