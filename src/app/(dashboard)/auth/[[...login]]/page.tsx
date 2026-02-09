@@ -21,7 +21,7 @@ const LoginPage = () => {
       setLoading(true);
       setMessage(null);
 
-      const result = await signIn('Credentials', {
+      const result = await signIn('credentials', {
         username,
         password,
         redirect: false,
@@ -29,10 +29,16 @@ const LoginPage = () => {
 
       if (result?.error) {
         setMessage('Invalid credentials');
+        return;
       }
 
-      setMessage('สำเร็จ');
-      router.push('/dashboard');
+      if (result?.ok) {
+        setMessage('สำเร็จ');
+        router.replace('/dashboard');
+        return;
+      }
+
+      setMessage('เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
     } catch {
       setMessage('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
     } finally {

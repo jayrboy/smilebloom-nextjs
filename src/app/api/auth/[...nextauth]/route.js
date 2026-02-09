@@ -7,10 +7,14 @@ import bcrypt from 'bcryptjs';
 export const authOptions = {
   providers: [
     CredentialsProvider({
+      id: "credentials",
       name: "Credentials",
       credentials: {},
-      async authorize(credentials, req) {
-        const { username, password } = credentials;
+      async authorize(credentials) {
+        const username = credentials?.username;
+        const password = credentials?.password;
+
+        if (!username || !password) return null;
 
         try {
           await connectMongoDB();
@@ -19,7 +23,11 @@ export const authOptions = {
           if (user) {
             const passwordsMatch = await bcrypt.compare(password, user.password);
             if (passwordsMatch) {
-              return user;
+              return {
+                id: user._id.toString(),
+                username: user.username,
+                role: user.role,
+              };
             } else {
               return null;
             }
@@ -35,6 +43,24 @@ export const authOptions = {
   ],
   session: {
     strategy: "jwt",
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.username = user.username;
+        token.role = user.role;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session?.user) {
+        session.user.id = token.id;
+        session.user.username = token.username;
+        session.user.role = token.role;
+      }
+      return session;
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
