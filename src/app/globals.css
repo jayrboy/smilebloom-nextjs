@@ -1,5 +1,24 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+}
+
+:root {
+  /* Brand / core colors */
+  --sb-bg: #ffffff;
+  --sb-text: #0f172a; /* slate-900 */
+  --sb-muted: #475569; /* slate-600 */
+  --sb-surface: #ffffff;
+  --sb-surface-2: #f8fafc; /* slate-50 */
+  --sb-border: rgba(15, 23, 42, 0.08);
+
+  /* Accent used across pages */
+  --sb-accent: #e11d48; /* rose-600 */
+  --sb-footer-bg: #1e1b4b; /* indigo-950 */
+}
+
 body {
-  background: gainsboro;
+  background: var(--sb-bg);
+  color: var(--sb-text);
 }

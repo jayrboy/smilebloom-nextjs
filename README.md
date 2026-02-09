@@ -34,3 +34,60 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+# Dockerfile
+
+```bash
+$ docker build -t smilebloom .
+$ docker run --rm -p 3000:3000 smilebloom
+```
+
+# Docker Hub
+
+```bash
+# Build and Run
+$ docker build -t jayrjakkrit/nextjs-smilebloom-app:0.1 .
+$ docker run -d -p 3000:3000 --name nextjs-smilebloom-app jayrjakkrit/nextjs-smilebloom-app:0.1
+# Upload Docker Hub
+$ docker push jayrjakkrit/nextjs-smilebloom-app:0.1
+# Download Docker Hub
+```
+
+# Docker Compose (Next.js + Nginx)
+
+โปรเจกต์นี้รันแบบ 2 services:
+- `app`: Next.js (`pnpm build` + `pnpm start`) ฟังที่ `3000`
+- `nginx`: reverse proxy รับที่ `80` แล้วส่งต่อไป `app:3000`
+
+## Run
+
+```bash
+docker compose up --build
+```
+
+เปิดในเบราว์เซอร์:
+- `http://localhost:${NGINX_PORT:-80}`
+
+## Logs
+
+```bash
+docker compose logs -f nginx app
+```
+
+## Test ด้วย curl
+
+```bash
+curl -I "http://localhost:${NGINX_PORT:-80}"
+```
+
+## Stop / Cleanup
+
+```bash
+docker compose down
+```
+
+## หมายเหตุ (NextAuth)
+
+ถ้าใช้ NextAuth แนะนำให้ตั้ง `NEXTAUTH_URL` ให้ตรงกับ URL ที่เข้าผ่าน Nginx เช่น:
+- ถ้า Nginx อยู่ที่พอร์ต 80: `NEXTAUTH_URL=http://localhost`
+- ถ้าเปลี่ยนพอร์ต: `NEXTAUTH_URL=http://localhost:<NGINX_PORT>`
