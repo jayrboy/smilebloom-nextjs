@@ -26,6 +26,12 @@ const userSchema = new mongoose.Schema({
   line_user_id: {
     type: String,
   },
+  facebook_user_id: {
+    type: String,
+  },
+  google_user_id: {
+    type: String,
+  },
 }, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
