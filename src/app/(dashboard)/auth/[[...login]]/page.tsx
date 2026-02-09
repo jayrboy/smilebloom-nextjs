@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 
@@ -13,6 +13,11 @@ const LoginPage = () => {
   const [message, setMessage] = useState<string | null>(null);
 
   const router = useRouter();
+
+  const { data: session, status } = useSession();
+  if (session && status === 'authenticated') {
+    router.replace('/dashboard');
+  }
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
+import { useSession } from 'next-auth/react';
 
 const RegisterPage = () => {
   const [username, setUsername] = useState('');
@@ -15,6 +16,11 @@ const RegisterPage = () => {
   const [message, setMessage] = useState<string | null>(null);
 
   const router = useRouter();
+
+  const { data: session, status } = useSession();
+  if (session && status === 'authenticated') {
+    router.replace('/dashboard');
+  }
 
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
