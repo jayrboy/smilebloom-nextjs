@@ -98,6 +98,14 @@ docker build -t smilebloom .
 docker run --rm -p 3000:3000 --env-file .env smilebloom
 ```
 
+**TH**: ถ้าต้องการให้คนอื่นเข้ามาทดลองผ่านพอร์ต 80 (เช่น `http://<server-ip>/`) ให้ map พอร์ต host `80` ไปที่พอร์ตใน container (`3000`)
+
+**EN**: To let others access via port 80 (e.g. `http://<server-ip>/`), map host port `80` to container port `3000`.
+
+```bash
+docker run --rm -p 80:3000 --env-file .env smilebloom
+```
+
 ### Docker Compose (Next.js + Nginx)
 
 **TH**: โปรเจกต์นี้รันแบบ 2 services:
