@@ -1,21 +1,35 @@
 import mongoose from 'mongoose';
 
-const childSchema = new mongoose.Schema({
-  fullname: { 
-    type: String, 
+const childSchema = new mongoose.Schema(
+  {
+    ownerUserId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      index: true,
+    },
+    fullname: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    birthday: {
+      type: Date,
+      required: true,
+    },
+    gender: {
+      type: String,
+      enum: ['MALE', 'FEMALE'],
+    },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+    },
   },
-  email: {
-    type: String,
-  },
-  birthday: {
-    type: Date,
-  },
-  gender: {
-    type: String,
-    enum: ['MALE', 'FEMALE'],
-  },
-}, { timestamps: true });
+  { timestamps: true }
+);
 
-const Child = mongoose.model('Child', childSchema);
+const Child = mongoose.models.Child || mongoose.model('Child', childSchema);
 
 export default Child;

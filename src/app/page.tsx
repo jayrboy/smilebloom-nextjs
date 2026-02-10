@@ -174,7 +174,7 @@ export default function HomePage() {
                 </form>
 
                 <Link
-                  href="/auth/sign-in"
+                  href="/auth/login"
                   className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-slate-200 hover:bg-slate-50"
                 >
                   ลงชื่อเข้าใช้
@@ -546,7 +546,7 @@ export default function HomePage() {
               </p>
               <div className="mt-4">
                 <Link
-                  href="/auth/sign-in"
+                  href="/auth/login"
                   className="inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold text-indigo-950 hover:bg-white/95"
                 >
                   ไปหน้าเข้าสู่ระบบ
