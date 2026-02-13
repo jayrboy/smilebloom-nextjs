@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react';
 import Navbar from '@/src/app/components/Navbar';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import MobileAppBar from '@/src/app/components/MobileAppBar';
 import { LuRefreshCcw } from 'react-icons/lu';
 import { FaEdit, FaTeeth } from 'react-icons/fa';
@@ -74,6 +74,8 @@ const DashboardPage = () => {
   const [editGender, setEditGender] = useState<'' | 'MALE' | 'FEMALE'>('');
   const [pendingDeleteId, setPendingDeleteId] = useState<string>('');
 
+  const hasAutoOpenedAddModalRef = useRef(false);
+
   const childrenCount = childrenList.length;
 
   const canAdd = useMemo(() => {
@@ -84,7 +86,7 @@ const DashboardPage = () => {
     return editFullname.trim().length > 0 && Boolean(editBirthday);
   }, [editFullname, editBirthday]);
 
-  const loadChildren = async () => {
+  const loadChildren = async ({ initial = false }: { initial?: boolean } = {}) => {
     setLoadingChildren(true);
     setError(null);
     setMessage(null);
@@ -92,7 +94,16 @@ const DashboardPage = () => {
       const res = await fetch('/api/children');
       const data = (await res.json()) as { children?: ChildRow[]; error?: string };
       if (!res.ok) throw new Error(data?.error || 'โหลดรายการเด็กไม่สำเร็จ');
-      setChildrenList((data.children || []) as ChildRow[]);
+      const list = (data.children || []) as ChildRow[];
+      setChildrenList(list);
+
+      // Auto-open add modal only on first entry (initial load) when no children exist.
+      if (initial && !hasAutoOpenedAddModalRef.current && list.length === 0) {
+        hasAutoOpenedAddModalRef.current = true;
+        setAddModalOpen(true);
+        setError(null);
+        setMessage(null);
+      }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'เกิดข้อผิดพลาด');
     } finally {
@@ -102,7 +113,7 @@ const DashboardPage = () => {
 
   useEffect(() => {
     if (status !== 'authenticated') return;
-    void loadChildren();
+    void loadChildren({ initial: true });
   }, [status]);
 
   useEffect(() => {
@@ -349,7 +360,7 @@ const DashboardPage = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={loadChildren}
+                      onClick={() => loadChildren({ initial: false })}
                       disabled={loadingChildren}
                       className="rounded-full px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                     >
