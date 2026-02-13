@@ -9,10 +9,10 @@ type ServiceItem = { name: string; desc: string };
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'หน้าแรก', href: '#home' },
-  { label: 'บริการ', href: '#services' },
-  { label: 'เวลาทำการ', href: '#hours' },
-  { label: 'ติดต่อ', href: '#contact' },
-  { label: 'เกี่ยวกับเรา', href: '#about' },
+  // { label: 'บริการ', href: '#services' },
+  // { label: 'เวลาทำการ', href: '#hours' },
+  // { label: 'ติดต่อ', href: '#contact' },
+  // { label: 'เกี่ยวกับเรา', href: '#about' },
 ];
 
 const SERVICES: ServiceItem[] = [
@@ -79,8 +79,10 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
+      {/* Navbar */}
       <header className="sticky top-0 z-50">
-        <div className="bg-slate-950/40 backdrop-blur supports-[backdrop-filter]:bg-slate-950/30">
+        {/* Topbar */}
+        {/* <div className="bg-slate-950/40 backdrop-blur supports-[backdrop-filter]:bg-slate-950/30">
           <div className="mx-auto max-w-6xl px-4">
             <div className="flex items-center justify-between py-2 text-xs text-white/90">
               <div className="flex items-center gap-3">
@@ -111,7 +113,7 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
           <div className="mx-auto max-w-6xl px-4">
@@ -127,7 +129,7 @@ export default function HomePage() {
                 <span className="h-0.5 w-5 bg-slate-700" />
               </button>
 
-              <a href="#home" className="flex items-center gap-2">
+              {/* <a href="#home" className="flex items-center gap-2">
                 <Image
                   src="/home/logo.svg"
                   alt="Smilebloom"
@@ -136,7 +138,7 @@ export default function HomePage() {
                   className="h-9 w-auto"
                   priority
                 />
-              </a>
+              </a> */}
 
               <nav className="hidden items-center gap-6 text-sm text-slate-700 lg:flex">
                 {NAV_ITEMS.map((item) => (
@@ -151,7 +153,8 @@ export default function HomePage() {
               </nav>
 
               <div className="flex flex-1 items-center justify-end gap-2">
-                <form
+                {/* Search */}
+                {/* <form
                   className="hidden max-w-[360px] flex-1 items-center gap-2 rounded-full bg-white px-3 py-2 ring-1 ring-slate-200 md:flex"
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -171,7 +174,7 @@ export default function HomePage() {
                   >
                     GO
                   </button>
-                </form>
+                </form> */}
 
                 <Link
                   href="/auth/login"
@@ -228,6 +231,7 @@ export default function HomePage() {
       </header>
 
       <main>
+        {/* Home */}
         <section
           id="home"
           className="relative overflow-hidden bg-gradient-to-br from-teal-700 via-emerald-700 to-teal-800"
@@ -235,40 +239,24 @@ export default function HomePage() {
           <div className="absolute inset-0 opacity-30 [background:radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.55),transparent_45%),radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.35),transparent_40%)]" />
           <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20">
             <div className="mx-auto max-w-2xl text-center text-white">
+              <h1 className="text-balance text-3xl font-extrabold tracking-tight sm:text-5xl">
+                Smilebloom
+              </h1>
+              <br />
               <div className="mx-auto mb-6 flex w-fit items-center justify-center rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/20">
                 <Image
-                  src="/home/logo.svg"
-                  alt="Smilebloom"
-                  width={160}
-                  height={60}
-                  className="h-10 w-auto"
+                  src="/teeth/deciduous-eruption.png"
+                  alt="Teeth"
+                  width={1000}
+                  height={600}
+                  className="h-auto w-full object-contain"
                 />
               </div>
-              <h1 className="text-balance text-3xl font-extrabold tracking-tight sm:text-5xl">
-                คลินิกบริการทันตกรรมพิเศษ
-              </h1>
               <p className="mt-4 text-pretty text-sm text-white/90 sm:text-base">
-                คลินิกทันตแพทยศาสตร์
+                เว็บแอปสำหรับติดตามลำดับการขึ้นของฟัน
                 <br className="hidden sm:block" />
-                จุฬาลงกรณ์มหาวิทยาลัย
+                และบันทึกเหตุการณ์ล่าสุด
               </p>
-
-              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <button
-                  type="button"
-                  className="w-full rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-white/95 sm:w-auto"
-                  onClick={() => scrollToId('contact')}
-                >
-                  นัดหมายทันที
-                </button>
-                <button
-                  type="button"
-                  className="w-full rounded-full bg-white/10 px-6 py-3 text-sm font-semibold text-white ring-1 ring-white/25 hover:bg-white/15 sm:w-auto"
-                  onClick={() => scrollToId('services')}
-                >
-                  ดูบริการทั้งหมด
-                </button>
-              </div>
             </div>
           </div>
 
@@ -276,6 +264,7 @@ export default function HomePage() {
           <div className="h-2 w-full bg-white/10" />
         </section>
 
+        {/* Introduction */}
         <section className="mx-auto max-w-6xl px-4 py-14 sm:py-16">
           <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
             <div className="lg:col-span-6">
@@ -283,24 +272,23 @@ export default function HomePage() {
                 ยิ้มสวย สุขภาพดี เริ่มได้ที่นี่
               </h2>
               <p className="mt-4 text-sm leading-7 text-slate-600">
-                ให้บริการทันตกรรมโดยทีมทันตแพทย์และบุคลากรผู้เชี่ยวชาญ
-                ดูแลอย่างใส่ใจ ตั้งแต่การตรวจประเมิน ไปจนถึงการรักษาและติดตามผล
+                สร้างสรรค์เว็บแอปสำหรับติดตามลำดับการขึ้นของฟันน้ำนมและบันทึกเหตุการณ์ล่าสุด
               </p>
 
               <div className="mt-6 rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
-                <p className="text-sm font-semibold text-slate-900">เปิดบริการด้วย</p>
+                <p className="text-sm font-semibold text-slate-900">ฟีเจอร์หลัก</p>
                 <ul className="mt-3 space-y-2 text-sm text-slate-700">
                   <li className="flex gap-2">
                     <span className="mt-2 h-1.5 w-1.5 rounded-full bg-rose-500" />
-                    เครื่องมือและระบบการดูแลมาตรฐาน
+                    สมัครสมาชิก / เข้าสู่ระบบ
                   </li>
                   <li className="flex gap-2">
                     <span className="mt-2 h-1.5 w-1.5 rounded-full bg-rose-500" />
-                    แผนการรักษาที่เหมาะสมกับแต่ละบุคคล
+                    ติดตามลำดับการขึ้นของฟันน้ำนม
                   </li>
                   <li className="flex gap-2">
                     <span className="mt-2 h-1.5 w-1.5 rounded-full bg-rose-500" />
-                    ติดตามผลหลังทำ เพื่อความมั่นใจ
+                    บันทึกเหตุการณ์ล่าสุด
                   </li>
                 </ul>
               </div>
@@ -308,14 +296,15 @@ export default function HomePage() {
 
             <div className="lg:col-span-6">
               <div className="grid gap-4 sm:grid-cols-2">
-                <ImageCard src="/home/intro-1.svg" alt="บรรยากาศคลินิก" />
-                <ImageCard src="/home/intro-2.svg" alt="ทีมแพทย์และการให้บริการ" />
+                <ImageCard src="/teeth/teeth-img.png" alt="บรรยากาศคลินิก" />
+                <ImageCard src="/teeth/teeth-img.png" alt="ทีมแพทย์และการให้บริการ" />
               </div>
             </div>
           </div>
         </section>
 
-        <section id="about" className="mx-auto max-w-6xl px-4 pb-10 sm:pb-12">
+        {/* About */}
+        {/* <section id="about" className="mx-auto max-w-6xl px-4 pb-10 sm:pb-12">
           <div className="rounded-3xl bg-slate-50 p-6 ring-1 ring-slate-200 sm:p-10">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
@@ -361,18 +350,10 @@ export default function HomePage() {
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
 
-        <section className="mx-auto max-w-6xl px-4 pb-6">
-          <div className="grid place-items-center py-8">
-            <div className="text-[84px] font-black leading-none text-indigo-950 sm:text-[110px]">
-              ฟ
-            </div>
-            <div className="mt-2 h-4 w-[260px] rounded-full bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200 shadow-inner sm:w-[340px]" />
-          </div>
-        </section>
-
-        <section id="services" className="mx-auto max-w-6xl px-4 py-14 sm:py-16">
+        {/* Services */}
+        {/* <section id="services" className="mx-auto max-w-6xl px-4 py-14 sm:py-16">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
@@ -418,9 +399,10 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-        </section>
+        </section> */}
 
-        <section id="hours" className="mx-auto max-w-6xl px-4 py-14 sm:py-16">
+        {/* Opening Date and Time */}
+        {/* <section id="hours" className="mx-auto max-w-6xl px-4 py-14 sm:py-16">
           <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
             วัน-เวลาที่เปิดบริการ
           </h2>
@@ -449,9 +431,10 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-        </section>
-
-        <section id="contact" className="mx-auto max-w-6xl px-4 pb-16">
+        </section> */}
+      
+        {/* Contact */}
+        {/* <section id="contact" className="mx-auto max-w-6xl px-4 pb-16">
           <div className="grid gap-8 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-10 lg:grid-cols-12 lg:items-center">
             <div className="lg:col-span-7">
               <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
@@ -506,10 +489,11 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
       </main>
 
-      <footer className="bg-indigo-950 text-white" >
+      {/* Footer */}
+      {/* <footer className="bg-indigo-950 text-white" >
         <div className="mx-auto max-w-6xl px-4 py-12">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <div>
@@ -559,7 +543,7 @@ export default function HomePage() {
             © {new Date().getFullYear()} Smilebloom. All rights reserved.
           </div>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 }
