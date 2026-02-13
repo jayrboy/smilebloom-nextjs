@@ -19,7 +19,7 @@ const Navbar = ({ session }) => {
     setLoading(true);
 
     try {
-      await signOut();
+      await signOut({ callbackUrl: '/auth/login' });
     } catch (error) {
       console.error('Error logging out: ', error);
     }finally {
