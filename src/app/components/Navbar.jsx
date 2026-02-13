@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 const NAV_LINKS = [
   { href: '/dashboard', label: 'Dashboard' },
@@ -14,12 +15,14 @@ const NAV_LINKS = [
 const Navbar = ({ session }) => {
   const [loading, setLoading] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const router = useRouter();
 
   const handleLogout = async () => {
     setLoading(true);
 
     try {
-      await signOut({ callbackUrl: '/auth/login' });
+      await signOut({ redirect: false });
+      router.replace('/auth/login');
     } catch (error) {
       console.error('Error logging out: ', error);
     }finally {
