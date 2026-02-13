@@ -10,6 +10,7 @@ import Navbar from '@/src/app/components/Navbar';
 import MobileAppBar from '@/src/app/components/MobileAppBar';
 import Child from '@/src/app/components/Child';
 import TeethEvent from '@/src/app/components/TeethEvent';
+import { TeethQuadrantProgress } from '@/src/app/components/TeethQuadrantProgress';
 
 type TeethType = 'DECIDUOUS' | 'PERMANENT';
 type ChildRow = {
@@ -332,6 +333,7 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
               }}
             />
 
+            {/* Teeth Monitoring */}
             <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
               <div className="grid gap-5 lg:grid-cols-12 lg:items-center">
                 <div className="lg:col-span-5">
@@ -386,6 +388,15 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
                   </p>
                 </div>
               </div>
+            </section>
+
+            {/* Saved quadrants overview */}
+            <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+              <TeethQuadrantProgress
+                imageUrl="https://img5.pic.in.th/file/secure-sv1/teethf064f9fae365c8c9.png"
+                teethList={teethList}
+                events={events}
+              />
             </section>
 
             <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
