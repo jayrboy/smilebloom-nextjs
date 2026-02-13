@@ -7,6 +7,17 @@ type TeethArch = 'UPPER' | 'LOWER';
 type TeethSide = 'LEFT' | 'RIGHT';
 type TeethEventType = 'ERUPTED' | 'SHED' | 'EXTRACTED' | 'NOTE';
 
+export type TeethToothBox = {
+  /** percent 0..100 (relative to image container) */
+  x: number;
+  /** percent 0..100 (relative to image container) */
+  y: number;
+  /** percent 0..100 (relative to image container) */
+  w: number;
+  /** percent 0..100 (relative to image container) */
+  h: number;
+};
+
 export type TeethQuadrantProgressTooth = {
   code: string;
   arch: TeethArch;
@@ -30,17 +41,9 @@ function mirrorSide(side: TeethSide): TeethSide {
   return side === 'LEFT' ? 'RIGHT' : 'LEFT';
 }
 
-function quadrantLabelTh(q: QuadrantKey) {
-  switch (q) {
-    case 'UPPER_RIGHT':
-      return 'บน-ขวา';
-    case 'UPPER_LEFT':
-      return 'บน-ซ้าย';
-    case 'LOWER_RIGHT':
-      return 'ล่าง-ขวา';
-    case 'LOWER_LEFT':
-      return 'ล่าง-ซ้าย';
-  }
+function mirrorBoxX(box: TeethToothBox): TeethToothBox {
+  // mirror horizontally inside a 0..100% coordinate space
+  return { ...box, x: 100 - box.x - box.w };
 }
 
 function typeStyle(type?: TeethEventType) {
@@ -56,48 +59,128 @@ function typeStyle(type?: TeethEventType) {
   return { overlay: 'bg-transparent ring-1 ring-slate-200/60', pill: 'bg-slate-50 text-slate-700 ring-slate-200' };
 }
 
+function deciduousSolidClassesByCode(code: string) {
+  // Match the color key in the reference infographic (by FDI last digit 1..5)
+  const last = (code || '').slice(-1);
+  switch (last) {
+    case '1': // central incisor
+      return { bg: 'bg-rose-500', ring: 'ring-rose-700' };
+    case '2': // lateral incisor
+      return { bg: 'bg-orange-500', ring: 'ring-orange-700' };
+    case '3': // canine
+      return { bg: 'bg-emerald-500', ring: 'ring-emerald-700' };
+    case '4': // first molar
+      return { bg: 'bg-indigo-600', ring: 'ring-indigo-800' };
+    case '5': // second molar
+      return { bg: 'bg-violet-600', ring: 'ring-violet-800' };
+    default:
+      return { bg: 'bg-slate-400', ring: 'ring-slate-600' };
+  }
+}
+
+function toothFrameClass(code: string, hasEvent: boolean) {
+  if (!hasEvent) return 'bg-transparent ring-1 ring-slate-200/60';
+  const c = deciduousSolidClassesByCode(code);
+  // "สีทึบ" + still keep a subtle edge
+  return [c.bg, 'ring-2', c.ring].join(' ');
+}
+
+/**
+ * Default boxes are only a starting point.
+ * You can freely tweak x/y/w/h per toothCode to match your image.
+ */
+export const DEFAULT_DECIDUOUS_TOOTH_BOXES: Record<string, TeethToothBox> = {
+  // UPPER_RIGHT: 51..55 (center -> outer)
+  '51': { x: 52, y: 16, w: 8, h: 10 },
+  '52': { x: 60, y: 16, w: 7, h: 10 },
+  '53': { x: 68, y: 16, w: 7, h: 10 },
+  '54': { x: 76, y: 16, w: 8, h: 10 },
+  '55': { x: 85, y: 16, w: 9, h: 10 },
+
+  // UPPER_LEFT: 61..65 (center -> outer)
+  '61': { x: 41, y: 16, w: 7, h: 16 },
+  '62': { x: 33, y: 16, w: 7, h: 16 },
+  '63': { x: 25, y: 16, w: 7, h: 16 },
+  '64': { x: 16, y: 16, w: 8, h: 16 },
+  '65': { x: 6, y: 16, w: 9, h: 16 },
+
+  // LOWER_RIGHT: 81..85 (center -> outer)
+  '81': { x: 52, y: 66, w: 7, h: 10 },
+  '82': { x: 63.5, y: 90.5, w: 7, h: 5 },
+  '83': { x: 68, y: 66, w: 7, h: 16 },
+  '84': { x: 76, y: 66, w: 8, h: 16 },
+  '85': { x: 85, y: 66, w: 9, h: 16 },
+
+  // LOWER_LEFT: 71..75 (center -> outer)
+  '71': { x: 40.5, y: 93, w: 7, h: 5 },
+  '72': { x: 33, y: 66, w: 7, h: 16 },
+  '73': { x: 25, y: 66, w: 7, h: 16 },
+  '74': { x: 16, y: 66, w: 8, h: 16 },
+  '75': { x: 6, y: 66, w: 9, h: 16 },
+};
+
 export function TeethQuadrantProgress({
   imageUrl,
   teethList,
   events,
   mirrorLeftRight = false,
   title = 'ภาพรวมซีกที่มีการบันทึกแล้ว',
+  toothBoxes = DEFAULT_DECIDUOUS_TOOTH_BOXES,
 }: {
   imageUrl: string;
   teethList: TeethQuadrantProgressTooth[];
   events: TeethQuadrantProgressEvent[];
   mirrorLeftRight?: boolean;
   title?: string;
+  /** Map toothCode -> {x,y,w,h} in percentages */
+  toothBoxes?: Record<string, TeethToothBox>;
 }) {
-  const latestTypeByQuadrant = useMemo(() => {
-    const toothMetaByCode = new Map<string, { arch: TeethArch; side: TeethSide }>();
+  const deciduousToothCodesByQuadrant = useMemo(() => {
+    // Decide "20 teeth" by FDI deciduous codes: 5x/6x/7x/8x and 1..5
+    const isDeciduousCode = (code: string) => /^[5-8][1-5]$/.test(code);
+
+    const byQ: Record<QuadrantKey, string[]> = {
+      UPPER_LEFT: [],
+      UPPER_RIGHT: [],
+      LOWER_LEFT: [],
+      LOWER_RIGHT: [],
+    };
+
     for (const t of teethList || []) {
       if (!t?.code) continue;
-      toothMetaByCode.set(t.code, { arch: t.arch, side: t.side });
+      if (!isDeciduousCode(t.code)) continue;
+
+      const side = mirrorLeftRight ? mirrorSide(t.side) : t.side;
+      const q = quadrantFromArchSide(t.arch, side);
+      byQ[q].push(t.code);
     }
 
-    const picked = new Map<QuadrantKey, TeethEventType>();
+    const sortAsc = (a: string, b: string) => a.localeCompare(b);
+    const sortDesc = (a: string, b: string) => b.localeCompare(a);
+
+    // Arrange so "center teeth" are near midline:
+    // - Left quadrants: outer→center (descending: 5→1)
+    // - Right quadrants: center→outer (ascending: 1→5)
+    byQ.UPPER_LEFT.sort(sortDesc);
+    byQ.LOWER_LEFT.sort(sortDesc);
+    byQ.UPPER_RIGHT.sort(sortAsc);
+    byQ.LOWER_RIGHT.sort(sortAsc);
+
+    return byQ;
+  }, [teethList, mirrorLeftRight]);
+
+  const latestTypeByToothCode = useMemo(() => {
+    // events are returned sorted DESC by eventDate/createdAt, so first seen per tooth = latest.
+    const picked = new Map<string, TeethEventType>();
     for (const ev of events || []) {
-      if (!ev?.toothCode) continue;
+      const code = ev?.toothCode?.trim();
+      if (!code) continue;
       if (!ev?.type || ev.type === 'NOTE') continue;
-      const meta = toothMetaByCode.get(ev.toothCode);
-      if (!meta) continue;
-
-      const side = mirrorLeftRight ? mirrorSide(meta.side) : meta.side;
-      const q = quadrantFromArchSide(meta.arch, side);
-      if (picked.has(q)) continue;
-      picked.set(q, ev.type);
-
-      if (picked.size === 4) break;
+      if (picked.has(code)) continue;
+      picked.set(code, ev.type);
     }
-
-    return {
-      UPPER_RIGHT: picked.get('UPPER_RIGHT'),
-      UPPER_LEFT: picked.get('UPPER_LEFT'),
-      LOWER_RIGHT: picked.get('LOWER_RIGHT'),
-      LOWER_LEFT: picked.get('LOWER_LEFT'),
-    } as Record<QuadrantKey, TeethEventType | undefined>;
-  }, [events, teethList, mirrorLeftRight]);
+    return picked;
+  }, [events]);
 
   const showMirrorHint = mirrorLeftRight;
 
@@ -140,6 +223,50 @@ export function TeethQuadrantProgress({
           alt="teeth quadrant overview"
           className="block h-auto w-full select-none object-contain filter grayscale"
         />
+
+        {/* Tooth frames (20 teeth) - positionable via x/y/w/h */}
+        <div className="pointer-events-none absolute inset-0">
+          {(
+            [
+              ...deciduousToothCodesByQuadrant.UPPER_LEFT,
+              ...deciduousToothCodesByQuadrant.UPPER_RIGHT,
+              ...deciduousToothCodesByQuadrant.LOWER_LEFT,
+              ...deciduousToothCodesByQuadrant.LOWER_RIGHT,
+            ] as const
+          ).map((code) => {
+            const hasEvent = latestTypeByToothCode.has(code);
+            const frame = toothFrameClass(code, hasEvent);
+            const rawBox = toothBoxes?.[code];
+            if (!rawBox) return null;
+            const box = mirrorLeftRight ? mirrorBoxX(rawBox) : rawBox;
+
+            return (
+              <div
+                key={code}
+                className={['absolute rounded-xl bg-transparent', frame].join(' ')}
+                style={{
+                  left: `${box.x}%`,
+                  top: `${box.y}%`,
+                  width: `${box.w}%`,
+                  height: `${box.h}%`,
+                }}
+              >
+                <div className="absolute left-1 top-1">
+                  <span
+                    className={[
+                      'rounded-md px-1.5 py-0.5 text-[10px] font-extrabold tracking-tight',
+                      hasEvent ? 'text-white/95' : 'text-slate-600',
+                      hasEvent ? 'drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]' : '',
+                      hasEvent ? '' : 'bg-white/70 ring-1 ring-slate-200 backdrop-blur',
+                    ].join(' ')}
+                  >
+                    {code}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
