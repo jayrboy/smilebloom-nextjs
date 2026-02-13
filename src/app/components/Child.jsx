@@ -2,14 +2,15 @@
 
 import { useMemo, useState } from 'react';
 
+// แสดงวัน-เดือน-ปี (format: DD-MM-YYYY)
 function formatDateInputValue(date) {
   try {
     const d = new Date(date);
     if (Number.isNaN(d.getTime())) return '';
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
   } catch {
     return '';
   }
@@ -91,13 +92,13 @@ const Child = ({ childrenList, selectedChildId, onSelect, onCreated }) => {
             ))}
           </select>
 
-          <button
+          {/* <button
             type="button"
             onClick={() => setOpen((v) => !v)}
             className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
           >
             + เพิ่มเด็ก
-          </button>
+          </button> */}
         </div>
       </div>
 
