@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { use, useEffect, useMemo, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 import Navbar from '@/src/app/components/Navbar';
 import MobileAppBar from '@/src/app/components/MobileAppBar';
@@ -125,12 +126,14 @@ function getDeciduousLegendByCode(code: string): DeciduousLegend | null {
   }
 }
 
-export default function TeethPageClient({ initialChildId = '' }: { initialChildId?: string }) {
+export default function TeethPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const childId = (id || '').trim();
   const { data: session, status } = useSession();
+  const router = useRouter();
 
   const [tab, setTab] = useState<TeethType>('DECIDUOUS');
   const [childrenList, setChildrenList] = useState<ChildRow[]>([]);
-  const [selectedChildId, setSelectedChildId] = useState<string>('');
   const [teethList, setTeethList] = useState<TeethDef[]>([]);
   const [events, setEvents] = useState<TeethEventRow[]>([]);
   const [loadingChildren, setLoadingChildren] = useState(false);
@@ -138,13 +141,24 @@ export default function TeethPageClient({ initialChildId = '' }: { initialChildI
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const eventsReqIdRef = useRef(0);
+
+  useEffect(() => {
+    if (!childId) return;
+    try {
+      localStorage.setItem('smilebloom:lastChildId', childId);
+    } catch {
+      // ignore
+    }
+  }, [childId]);
+
   const selectedChild = useMemo(() => {
-    return childrenList.find((c) => c._id === selectedChildId) || null;
-  }, [childrenList, selectedChildId]);
+    return childrenList.find((c) => c._id === childId) || null;
+  }, [childrenList, childId]);
 
   const childAgeMonths = useMemo(() => ageInMonths(selectedChild?.birthday), [selectedChild?.birthday]);
 
-  const loadChildren = async (preferredChildId?: string) => {
+  const loadChildren = async () => {
     setLoadingChildren(true);
     setError(null);
     try {
@@ -153,15 +167,9 @@ export default function TeethPageClient({ initialChildId = '' }: { initialChildI
       if (!res.ok) throw new Error(data?.error || 'โหลดรายการเด็กไม่สำเร็จ');
       const list = (data.children || []) as ChildRow[];
       setChildrenList(list);
-      if (list.length > 0) {
-        const preferred = (preferredChildId || '').trim();
-        const hasPreferred = preferred && list.some((c) => c._id === preferred);
-        const hasSelected = selectedChildId && list.some((c) => c._id === selectedChildId);
 
-        if (hasPreferred) setSelectedChildId(preferred);
-        else if (!hasSelected) setSelectedChildId(list[0]._id);
-      } else {
-        setSelectedChildId('');
+      if (list.length > 0 && childId && !list.some((c) => c._id === childId)) {
+        router.replace(`/teeth/${encodeURIComponent(list[0]._id)}`);
       }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'เกิดข้อผิดพลาด');
@@ -185,46 +193,41 @@ export default function TeethPageClient({ initialChildId = '' }: { initialChildI
     }
   };
 
-  const loadEvents = async (childId?: string) => {
-    const cid = childId || selectedChildId;
-    if (!cid) {
+  const loadEvents = async (cid?: string) => {
+    const id = (cid || childId || '').trim();
+    if (!id) {
       setEvents([]);
       return;
     }
+    const reqId = ++eventsReqIdRef.current;
     setLoadingEvents(true);
     setError(null);
     try {
-      const res = await fetch(`/api/teeth-events?childId=${encodeURIComponent(cid)}&limit=100`);
+      const res = await fetch(`/api/teeth-events?childId=${encodeURIComponent(id)}&limit=100`);
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'โหลดเหตุการณ์ไม่สำเร็จ');
+      if (reqId !== eventsReqIdRef.current) return;
       setEvents((data.events || []) as TeethEventRow[]);
     } catch (e: unknown) {
+      if (reqId !== eventsReqIdRef.current) return;
       setError(e instanceof Error ? e.message : 'เกิดข้อผิดพลาด');
     } finally {
-      setLoadingEvents(false);
+      if (reqId === eventsReqIdRef.current) setLoadingEvents(false);
     }
   };
 
   useEffect(() => {
     if (status !== 'authenticated') return;
-    loadChildren(initialChildId);
-    loadTeeth();
+    void loadChildren();
+    void loadTeeth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
   useEffect(() => {
-    const preferred = (initialChildId || '').trim();
-    if (!preferred) return;
-    if (preferred === selectedChildId) return;
-    if (childrenList.length > 0 && !childrenList.some((c) => c._id === preferred)) return;
-    setSelectedChildId(preferred);
-  }, [initialChildId, selectedChildId, childrenList]);
-
-  useEffect(() => {
     if (status !== 'authenticated') return;
-    loadEvents(selectedChildId);
+    void loadEvents(childId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedChildId, status]);
+  }, [childId, status]);
 
   const teethByTab = useMemo(() => {
     return teethList
@@ -253,9 +256,7 @@ export default function TeethPageClient({ initialChildId = '' }: { initialChildI
             <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
               ลำดับการขึ้นฟัน & บันทึกเหตุการณ์
             </h1>
-            <p className="mt-2 text-sm text-slate-600">
-              เลือกเด็ก แล้วบันทึกเหตุการณ์เพื่อดูย้อนหลัง (ฟันน้ำนม)
-            </p>
+            <p className="mt-2 text-sm text-slate-600">เลือกเด็ก แล้วบันทึกเหตุการณ์เพื่อดูย้อนหลัง (ฟันน้ำนม)</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -294,12 +295,8 @@ export default function TeethPageClient({ initialChildId = '' }: { initialChildI
 
         {status === 'unauthenticated' && (
           <div className="mt-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
-            <div className="text-lg font-extrabold tracking-tight text-slate-900">
-              กรุณาเข้าสู่ระบบเพื่อใช้งานฟีเจอร์นี้
-            </div>
-            <p className="mt-2 text-sm text-slate-600">
-              เพื่อบันทึกข้อมูลเด็กและเหตุการณ์การขึ้นฟัน
-            </p>
+            <div className="text-lg font-extrabold tracking-tight text-slate-900">กรุณาเข้าสู่ระบบเพื่อใช้งานฟีเจอร์นี้</div>
+            <p className="mt-2 text-sm text-slate-600">เพื่อบันทึกข้อมูลเด็กและเหตุการณ์การขึ้นฟัน</p>
             <div className="mt-4 flex flex-wrap gap-2">
               <Link
                 href="/auth/login"
@@ -327,9 +324,12 @@ export default function TeethPageClient({ initialChildId = '' }: { initialChildI
 
             <Child
               childrenList={childrenList}
-              selectedChildId={selectedChildId}
-              onSelect={(id: string) => setSelectedChildId(id)}
-              onCreated={() => loadChildren()}
+              selectedChildId={childId}
+              onSelect={(id: string) => router.push(`/teeth/${encodeURIComponent(id)}`)}
+              onCreated={(child?: { _id?: string }) => {
+                void loadChildren();
+                if (child?._id) router.push(`/teeth/${encodeURIComponent(child._id)}`);
+              }}
             />
 
             <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
@@ -403,8 +403,8 @@ export default function TeethPageClient({ initialChildId = '' }: { initialChildI
                 <button
                   type="button"
                   onClick={() => {
-                    loadTeeth();
-                    loadEvents();
+                    void loadTeeth();
+                    void loadEvents();
                   }}
                   className="rounded-full px-3 py-1.5 text-xs font-semibold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
                 >
@@ -486,9 +486,7 @@ export default function TeethPageClient({ initialChildId = '' }: { initialChildI
                         )}
 
                         {inWindow && (
-                          <div className="mt-3 text-xs font-semibold text-rose-700">
-                            อยู่ในช่วงที่พบบ่อยสำหรับการขึ้นของซี่นี้
-                          </div>
+                          <div className="mt-3 text-xs font-semibold text-rose-700">อยู่ในช่วงที่พบบ่อยสำหรับการขึ้นของซี่นี้</div>
                         )}
                       </div>
                     );
@@ -499,11 +497,11 @@ export default function TeethPageClient({ initialChildId = '' }: { initialChildI
             </section>
 
             <TeethEvent
-              childId={selectedChildId}
+              childId={childId}
               teethType={tab}
               teethList={teethList}
               events={events}
-              onReload={() => loadEvents()}
+              onReload={() => loadEvents(childId)}
             />
 
             {pageBusy && <div className="text-center text-sm text-slate-500">กำลังโหลดข้อมูล...</div>}
@@ -515,4 +513,3 @@ export default function TeethPageClient({ initialChildId = '' }: { initialChildI
     </div>
   );
 }
-

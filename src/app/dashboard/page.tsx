@@ -497,7 +497,7 @@ const DashboardPage = () => {
                               ) : (
                                 <>
                                   <Link
-                                    href={`/teeth?childId=${encodeURIComponent(c._id)}`}
+                                    href={`/teeth/${encodeURIComponent(c._id)}`}
                                     className="rounded-full bg-emerald-700 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-800"
                                   >
                                     <FaTeeth className="h-4 w-4" />
@@ -641,7 +641,7 @@ const DashboardPage = () => {
                               ) : (
                                 <>
                                   <Link
-                                    href={`/teeth?childId=${encodeURIComponent(c._id)}`}
+                                    href={`/teeth/${encodeURIComponent(c._id)}`}
                                     className="rounded-full bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-800 whitespace-nowrap"
                                   >
                                     <FaTeeth className="h-4 w-4" />
@@ -787,11 +787,7 @@ const DashboardPage = () => {
                       </div>
 
                       <div className="pt-2 text-xs text-slate-500">
-                        เคล็ดลับ: เพิ่มเด็กแล้วไปหน้า{' '}
-                        <Link href="/teeth" className="font-semibold text-slate-700 underline">
-                          Teeth
-                        </Link>{' '}
-                        เพื่อบันทึกเหตุการณ์การขึ้นฟัน
+                        เคล็ดลับ: เพิ่มเด็กแล้วกดไอคอน “ฟัน” ในแถวรายการเด็ก เพื่อบันทึกเหตุการณ์การขึ้นฟัน
                       </div>
                     </form>
                   </div>

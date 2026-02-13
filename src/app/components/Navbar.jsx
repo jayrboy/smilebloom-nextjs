@@ -1,22 +1,33 @@
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { GiHamburgerMenu } from "react-icons/gi"
 
-const NAV_LINKS = [
-  { href: '/dashboard', label: 'หน้าหลัก' },
-  { href: '/teeth', label: 'ฟันที่ต้องรักษา' },
-  { href: '/profile', label: 'ข้อมูลส่วนตัว' },
-];
-
 const Navbar = ({ session }) => {
   const [loading, setLoading] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [teethHref, setTeethHref] = useState('/dashboard');
   const router = useRouter();
+
+  useEffect(() => {
+    try {
+      const lastChildId = localStorage.getItem('smilebloom:lastChildId');
+      if (lastChildId) setTeethHref(`/teeth/${encodeURIComponent(lastChildId)}`);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const navLinks = useMemo(() => {
+    return [
+      { href: '/dashboard', label: 'หน้าหลัก' },
+      { href: teethHref, label: 'ฟันที่ต้องรักษา' },
+      { href: '/profile', label: 'ข้อมูลส่วนตัว' },
+    ];
+  }, [teethHref]);
 
   const handleLogout = async () => {
     setLoading(true);
@@ -61,9 +72,9 @@ const Navbar = ({ session }) => {
               </Link> */}
 
               <nav className="hidden items-center gap-1 text-sm lg:flex">
-                {NAV_LINKS.map((item) => (
+                {navLinks.map((item) => (
                   <Link
-                    key={item.href}
+                    key={`${item.label}-${item.href}`}
                     href={item.href}
                     className="rounded-xl px-3 py-2 font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                   >
@@ -97,9 +108,9 @@ const Navbar = ({ session }) => {
               <div className="pb-4 lg:hidden">
                 <div className="rounded-2xl bg-white p-3 shadow-sm ring-1 ring-black/5">
                   <div className="grid gap-1 text-sm">
-                    {NAV_LINKS.map((item) => (
+                    {navLinks.map((item) => (
                       <Link
-                        key={item.href}
+                        key={`${item.label}-${item.href}`}
                         href={item.href}
                         className="rounded-xl px-3 py-2 font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900"
                         onClick={() => setMobileOpen(false)}

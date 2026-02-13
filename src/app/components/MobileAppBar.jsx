@@ -1,9 +1,20 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 const MobileAppBar = ({ session }) => {
   const isAuthed = Boolean(session?.user?.username);
+  const [teethHref, setTeethHref] = useState('/dashboard');
+
+  useEffect(() => {
+    try {
+      const lastChildId = localStorage.getItem('smilebloom:lastChildId');
+      if (lastChildId) setTeethHref(`/teeth/${encodeURIComponent(lastChildId)}`);
+    } catch {
+      // ignore
+    }
+  }, []);
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70 lg:hidden">
@@ -14,7 +25,7 @@ const MobileAppBar = ({ session }) => {
         >
           Dashboard
         </Link>
-        <Link href="/teeth" className="rounded-xl px-3 py-2 text-center hover:bg-slate-100">
+        <Link href={teethHref} className="rounded-xl px-3 py-2 text-center hover:bg-slate-100">
           Teeth
         </Link>
         <Link
