@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -52,10 +53,20 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-slate-950">
       <div className="relative isolate">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-teal-700 via-emerald-700 to-teal-800 opacity-90" />
-        <div className="absolute inset-0 -z-10 opacity-30 [background:radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.55),transparent_45%),radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.35),transparent_40%)]" />
+        <div className="absolute inset-0 -z-20" aria-hidden="true">
+          <Image
+            src="/teeth/smilebloom-bg.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center brightness-75 saturate-125"
+          />
+        </div>
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-teal-950/70 via-emerald-950/55 to-slate-950/75" />
+        <div className="absolute inset-0 -z-10 opacity-25 [background:radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.50),transparent_45%),radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.28),transparent_40%)]" />
 
         <div className="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-4 py-12">
           <div className="w-full max-w-md">
