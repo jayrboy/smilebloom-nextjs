@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 
 import Navbar from '@/src/app/components/Navbar';
 import MobileAppBar from '@/src/app/components/MobileAppBar';
@@ -127,6 +128,8 @@ function getDeciduousLegendByCode(code: string): DeciduousLegend | null {
 
 const TeethPage = () => {
   const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
+  const preferredChildId = (searchParams.get('childId') || '').trim();
   const [tab, setTab] = useState<TeethType>('DECIDUOUS');
   const [childrenList, setChildrenList] = useState<ChildRow[]>([]);
   const [selectedChildId, setSelectedChildId] = useState<string>('');
@@ -143,7 +146,7 @@ const TeethPage = () => {
 
   const childAgeMonths = useMemo(() => ageInMonths(selectedChild?.birthday), [selectedChild?.birthday]);
 
-  const loadChildren = async () => {
+  const loadChildren = async (opts?: { preferredChildId?: string }) => {
     setLoadingChildren(true);
     setError(null);
     try {
@@ -152,7 +155,12 @@ const TeethPage = () => {
       if (!res.ok) throw new Error(data?.error || 'โหลดรายการเด็กไม่สำเร็จ');
       const list = (data.children || []) as ChildRow[];
       setChildrenList(list);
-      if (!selectedChildId && list.length > 0) setSelectedChildId(list[0]._id);
+      const pref = (opts?.preferredChildId || '').trim();
+      if (pref && list.some((c) => c._id === pref)) {
+        setSelectedChildId(pref);
+      } else if (!selectedChildId && list.length > 0) {
+        setSelectedChildId(list[0]._id);
+      }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'เกิดข้อผิดพลาด');
     } finally {
@@ -197,10 +205,21 @@ const TeethPage = () => {
 
   useEffect(() => {
     if (status !== 'authenticated') return;
-    loadChildren();
+    loadChildren({ preferredChildId });
     loadTeeth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
+
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    if (!preferredChildId) return;
+    if (childrenList.some((c) => c._id === preferredChildId)) {
+      setSelectedChildId(preferredChildId);
+    } else {
+      loadChildren({ preferredChildId });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preferredChildId, status]);
 
   useEffect(() => {
     if (status !== 'authenticated') return;
@@ -236,7 +255,7 @@ const TeethPage = () => {
               ลำดับการขึ้นฟัน & บันทึกเหตุการณ์
             </h1>
             <p className="mt-2 text-sm text-slate-600">
-              เลือกเด็ก แล้วบันทึกเหตุการณ์เพื่อดูย้อนหลัง (ฟันน้ำนม + ฟันแท้)
+              เลือกเด็ก แล้วบันทึกเหตุการณ์เพื่อดูย้อนหลัง (ฟันน้ำนม)
             </p>
           </div>
 
@@ -253,7 +272,7 @@ const TeethPage = () => {
             >
               ฟันน้ำนม
             </button>
-            <button
+            {/* <button
               type="button"
               onClick={() => setTab('PERMANENT')}
               className={[
@@ -264,7 +283,7 @@ const TeethPage = () => {
               ].join(' ')}
             >
               ฟันแท้
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -306,6 +325,13 @@ const TeethPage = () => {
                 {error}
               </div>
             )}
+
+            <Child
+              childrenList={childrenList}
+              selectedChildId={selectedChildId}
+              onSelect={(id: string) => setSelectedChildId(id)}
+              onCreated={() => loadChildren()}
+            />
 
             <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
               <div className="grid gap-5 lg:grid-cols-12 lg:items-center">
@@ -363,13 +389,6 @@ const TeethPage = () => {
               </div>
             </section>
 
-            <Child
-              childrenList={childrenList}
-              selectedChildId={selectedChildId}
-              onSelect={(id: string) => setSelectedChildId(id)}
-              onCreated={() => loadChildren()}
-            />
-
             <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
@@ -395,86 +414,92 @@ const TeethPage = () => {
               </div>
 
               <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {teethByTab.map((t) => {
-                  const last = lastEventByTooth.get(t.code);
-                  const statusText =
-                    last?.type === 'ERUPTED'
-                      ? 'ขึ้นแล้ว'
-                      : last?.type === 'SHED'
-                        ? 'หลุดแล้ว'
-                        : last?.type === 'EXTRACTED'
-                          ? 'ถอนแล้ว'
-                          : 'ยังไม่บันทึก';
+                {teethByTab
+                  .filter((t) => {
+                    const last = lastEventByTooth.get(t.code);
+                    // แสดงเฉพาะฟันที่มีการบันทึก event เท่านั้น
+                    return last && last.type && last.type !== 'NOTE';
+                  })
+                  .map((t) => {
+                    const last = lastEventByTooth.get(t.code);
+                    const statusText =
+                      last?.type === 'ERUPTED'
+                        ? 'ขึ้นแล้ว'
+                        : last?.type === 'SHED'
+                          ? 'หลุดแล้ว'
+                          : last?.type === 'EXTRACTED'
+                            ? 'ถอนแล้ว'
+                            : 'ยังไม่บันทึก';
 
-                  const inWindow =
-                    childAgeMonths !== null &&
-                    childAgeMonths >= t.start_occurrence_month &&
-                    childAgeMonths <= t.end_occurrence_month;
+                    const inWindow =
+                      childAgeMonths !== null &&
+                      childAgeMonths >= t.start_occurrence_month &&
+                      childAgeMonths <= t.end_occurrence_month;
 
-                  const deciduousLegend =
-                    tab === 'DECIDUOUS' ? getDeciduousLegendByCode(t.code) : null;
+                    const deciduousLegend =
+                      tab === 'DECIDUOUS' ? getDeciduousLegendByCode(t.code) : null;
 
-                  return (
-                    <div
-                      key={t.code}
-                      className={[
-                        'rounded-2xl p-4 ring-1 transition',
-                        inWindow
-                          ? 'bg-rose-50 ring-rose-100'
-                          : 'bg-white ring-slate-200 hover:shadow-sm',
-                        deciduousLegend ? deciduousLegend.ringClass : '',
-                      ].join(' ')}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
-                            <span>{t.code}</span>
-                            {deciduousLegend && (
-                              <span className="inline-flex items-center gap-1.5">
-                                <span
-                                  className={[
-                                    'h-2.5 w-2.5 rounded-sm',
-                                    deciduousLegend.dotClass,
-                                  ].join(' ')}
-                                />
-                                <span className="text-slate-500">{deciduousLegend.label}</span>
-                              </span>
-                            )}
+                    return (
+                      <div
+                        key={t.code}
+                        className={[
+                          'rounded-2xl p-4 ring-1 transition',
+                          inWindow
+                            ? 'bg-rose-50 ring-rose-100'
+                            : 'bg-white ring-slate-200 hover:shadow-sm',
+                          deciduousLegend ? deciduousLegend.ringClass : '',
+                        ].join(' ')}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+                              <span>{t.code}</span>
+                              {deciduousLegend && (
+                                <span className="inline-flex items-center gap-1.5">
+                                  <span
+                                    className={[
+                                      'h-2.5 w-2.5 rounded-sm',
+                                      deciduousLegend.dotClass,
+                                    ].join(' ')}
+                                  />
+                                  <span className="text-slate-500">{deciduousLegend.label}</span>
+                                </span>
+                              )}
+                            </div>
+                            <div className="mt-1 text-sm font-extrabold text-slate-900">{t.name_th}</div>
                           </div>
-                          <div className="mt-1 text-sm font-extrabold text-slate-900">{t.name_th}</div>
+                          <span
+                            className={[
+                              'rounded-full px-2.5 py-1 text-xs font-semibold ring-1',
+                              statusText === 'ขึ้นแล้ว'
+                                ? 'bg-emerald-50 text-emerald-800 ring-emerald-100'
+                                : statusText === 'ยังไม่บันทึก'
+                                  ? 'bg-slate-50 text-slate-700 ring-slate-200'
+                                  : 'bg-indigo-50 text-indigo-800 ring-indigo-100',
+                            ].join(' ')}
+                          >
+                            {statusText}
+                          </span>
                         </div>
-                        <span
-                          className={[
-                            'rounded-full px-2.5 py-1 text-xs font-semibold ring-1',
-                            statusText === 'ขึ้นแล้ว'
-                              ? 'bg-emerald-50 text-emerald-800 ring-emerald-100'
-                              : statusText === 'ยังไม่บันทึก'
-                                ? 'bg-slate-50 text-slate-700 ring-slate-200'
-                                : 'bg-indigo-50 text-indigo-800 ring-indigo-100',
-                          ].join(' ')}
-                        >
-                          {statusText}
-                        </span>
+
+                        <div className="mt-3 text-xs text-slate-600">
+                          ช่วงขึ้นโดยประมาณ: {t.start_occurrence_month}–{t.end_occurrence_month} เดือน
+                        </div>
+
+                        {tab === 'DECIDUOUS' && t.start_destory_month && t.end_destory_month && (
+                          <div className="mt-1 text-xs text-slate-600">
+                            ช่วงหลุด/เปลี่ยน: {t.start_destory_month}–{t.end_destory_month} เดือน
+                          </div>
+                        )}
+
+                        {inWindow && (
+                          <div className="mt-3 text-xs font-semibold text-rose-700">
+                            อยู่ในช่วงที่พบบ่อยสำหรับการขึ้นของซี่นี้
+                          </div>
+                        )}
                       </div>
-
-                      <div className="mt-3 text-xs text-slate-600">
-                        ช่วงขึ้นโดยประมาณ: {t.start_occurrence_month}–{t.end_occurrence_month} เดือน
-                      </div>
-
-                      {tab === 'DECIDUOUS' && t.start_destory_month && t.end_destory_month && (
-                        <div className="mt-1 text-xs text-slate-600">
-                          ช่วงหลุด/เปลี่ยน: {t.start_destory_month}–{t.end_destory_month} เดือน
-                        </div>
-                      )}
-
-                      {inWindow && (
-                        <div className="mt-3 text-xs font-semibold text-rose-700">
-                          อยู่ในช่วงที่พบบ่อยสำหรับการขึ้นของซี่นี้
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
 
               {loadingTeeth && (

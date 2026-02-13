@@ -95,7 +95,7 @@ const RegisterPage = () => {
                     placeholder="ชื่อผู้ใช้"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="mt-2 w-full rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 ring-1 ring-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-400"
+                    className="mt-2 w-full rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 ring-1 ring-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600"
                     autoComplete="username"
                   />
                 </div>
@@ -110,7 +110,7 @@ const RegisterPage = () => {
                       placeholder="รหัสผ่าน"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="mt-2 w-full rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 ring-1 ring-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-400"
+                      className="mt-2 w-full rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 ring-1 ring-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600"
                       autoComplete="current-password"
                     />
                     <div className="absolute right-3 top-7 -translate-y-1/2 flex items-center">
@@ -141,7 +141,7 @@ const RegisterPage = () => {
                       placeholder="ยืนยันรหัสผ่าน"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="mt-2 w-full rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 ring-1 ring-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-400"
+                      className="mt-2 w-full rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 ring-1 ring-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600"
                       autoComplete="current-confirm-password"
                     />
                     <div className="absolute right-3 top-7 -translate-y-1/2 flex items-center">
@@ -200,7 +200,7 @@ const RegisterPage = () => {
                     href="/"
                     className="font-semibold text-slate-700 hover:text-slate-900"
                   >
-                    Home
+                    หน้าแรก
                   </Link>
                 </div>
               </form>

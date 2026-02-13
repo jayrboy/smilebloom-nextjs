@@ -5,11 +5,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { GiHamburgerMenu } from "react-icons/gi"
 
 const NAV_LINKS = [
-  { href: '/dashboard', label: 'Dashboard' },
-  { href: '/teeth', label: 'Teeth' },
-  { href: '/profile', label: 'Profile' },
+  { href: '/dashboard', label: 'หน้าหลัก' },
+  { href: '/teeth', label: 'ฟันที่ต้องรักษา' },
+  { href: '/profile', label: 'ข้อมูลส่วนตัว' },
 ];
 
 const Navbar = ({ session }) => {
@@ -37,16 +38,18 @@ const Navbar = ({ session }) => {
             <div className="flex items-center justify-between gap-3 py-3">
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-xl px-2 py-2 text-slate-700 hover:bg-slate-100 lg:hidden"
+                className="inline-flex items-center justify-center rounded-xl px-2 py-2 text-slate-700 hover:bg-slate-100 lg:hidden focus:outline-none"
                 aria-label="เปิดเมนู"
                 onClick={() => setMobileOpen((v) => !v)}
               >
-                <span className="h-0.5 w-5 bg-slate-700" />
-                <span className="h-0.5 w-5 bg-slate-700" />
-                <span className="h-0.5 w-5 bg-slate-700" />
+                <GiHamburgerMenu size={24} />
               </button>
 
-              <Link href="/" className="flex items-center gap-2">
+              <span className="text-xl font-extrabold tracking-tight text-slate-900">
+                Smilebloom
+              </span>
+
+              {/* <Link href="/" className="flex items-center gap-2">
                 <Image
                   src="/home/logo.svg"
                   alt="Smilebloom"
@@ -55,7 +58,7 @@ const Navbar = ({ session }) => {
                   className="h-9 w-auto"
                   priority
                 />
-              </Link>
+              </Link> */}
 
               <nav className="hidden items-center gap-1 text-sm lg:flex">
                 {NAV_LINKS.map((item) => (
@@ -77,14 +80,14 @@ const Navbar = ({ session }) => {
                     disabled={loading}
                     className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-slate-200 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {loading ? 'กำลังออกจากระบบ...' : 'Logout'}
+                    {loading ? 'กำลังออกจากระบบ...' : 'ออกจากระบบ'}
                   </button>
                 ) : (
                   <Link
                     href="/auth/login"
                     className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-slate-200 hover:bg-slate-50"
                   >
-                    Login
+                    เข้าสู่ระบบ
                   </Link>
                 )}
               </div>
@@ -117,7 +120,7 @@ const Navbar = ({ session }) => {
                         disabled={loading}
                         className="w-full rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        {loading ? 'กำลังออกจากระบบ...' : 'Logout'}
+                        {loading ? 'กำลังออกจากระบบ...' : 'ออกจากระบบ'}
                       </button>
                     ) : (
                       <Link

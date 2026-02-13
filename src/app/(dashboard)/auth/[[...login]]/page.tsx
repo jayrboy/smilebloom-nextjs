@@ -2,20 +2,35 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
-import { signIn, useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
+const REMEMBER_ME_KEY = 'sb_remember_me';
+const REMEMBERED_USERNAME_KEY = 'sb_remembered_username';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   const router = useRouter();
 
-  const { data: session, status } = useSession();
+  useEffect(() => {
+    try {
+      const shouldRemember = localStorage.getItem(REMEMBER_ME_KEY) === 'true';
+      const rememberedUsername = localStorage.getItem(REMEMBERED_USERNAME_KEY);
+
+      if (shouldRemember) {
+        setRememberMe(true);
+        if (rememberedUsername) setUsername(rememberedUsername);
+      }
+    } catch {
+      // Ignore storage access errors (e.g. blocked in some environments)
+    }
+  }, []);
   
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -27,6 +42,7 @@ const LoginPage = () => {
       const result = await signIn('credentials', {
         username,
         password,
+        remember: rememberMe,
         redirect: false,
       });
 
@@ -37,6 +53,19 @@ const LoginPage = () => {
 
       if (result?.ok) {
         setMessage('สำเร็จ');
+
+        try {
+          if (rememberMe) {
+            localStorage.setItem(REMEMBER_ME_KEY, 'true');
+            localStorage.setItem(REMEMBERED_USERNAME_KEY, username);
+          } else {
+            localStorage.removeItem(REMEMBER_ME_KEY);
+            localStorage.removeItem(REMEMBERED_USERNAME_KEY);
+          }
+        } catch {
+          // Ignore storage access errors
+        }
+
         router.replace('/dashboard');
         return;
       }
@@ -86,7 +115,7 @@ const LoginPage = () => {
                     placeholder="ชื่อผู้ใช้"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="mt-2 w-full rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 ring-1 ring-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-400"
+                    className="mt-2 w-full rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 ring-1 ring-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600"
                     autoComplete="username"
                   />
                 </div>
@@ -100,7 +129,7 @@ const LoginPage = () => {
                     placeholder="รหัสผ่าน"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="mt-2 w-full rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 ring-1 ring-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-400"
+                    className="mt-2 w-full rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 ring-1 ring-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600"
                     autoComplete="current-password"
                   />
                 </div>
@@ -109,6 +138,8 @@ const LoginPage = () => {
                   <label className="flex items-center gap-2 text-slate-600">
                     <input
                       type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
                       className="h-4 w-4 rounded border-slate-300 text-slate-900"
                     />
                     จำฉันไว้
@@ -160,7 +191,7 @@ const LoginPage = () => {
                     href="/"
                     className="font-semibold text-slate-700 hover:text-slate-900"
                   >
-                    Home
+                    หน้าแรก
                   </Link>
                 </div>
               </form>
