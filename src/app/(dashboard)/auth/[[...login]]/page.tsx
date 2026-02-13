@@ -57,7 +57,7 @@ const LoginPage = () => {
       <div className="relative isolate">
         <div className="absolute inset-0 -z-20" aria-hidden="true">
           <Image
-            src="/teeth/smilebloom-bg.jpg"
+            src="https://img5.pic.in.th/file/secure-sv1/smilebloom-bg.jpg"
             alt=""
             fill
             priority
