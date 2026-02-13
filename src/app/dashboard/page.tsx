@@ -6,14 +6,15 @@ import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import MobileAppBar from '@/src/app/components/MobileAppBar';
 import { LuRefreshCcw } from 'react-icons/lu';
-import { FaEdit, FaTeeth } from 'react-icons/fa';
+import { FaEdit, FaFemale, FaMale, FaTeeth, FaUser } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 
+type Gender = 'MALE' | 'FEMALE';
 type ChildRow = {
   _id: string;
   fullname: string;
   birthday: string;
-  gender?: 'MALE' | 'FEMALE';
+  gender?: Gender;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -49,6 +50,82 @@ function genderText(g?: ChildRow['gender']) {
   return '-';
 }
 
+function genderPillClass(g?: ChildRow['gender']) {
+  if (g === 'MALE') return 'bg-sky-50 text-sky-800 ring-sky-200';
+  if (g === 'FEMALE') return 'bg-rose-50 text-rose-800 ring-rose-200';
+  return 'bg-slate-50 text-slate-700 ring-slate-200';
+}
+
+function GenderAvatar({ gender }: { gender?: ChildRow['gender'] }) {
+  return (
+    <span
+      className={[
+        'inline-flex h-9 w-9 items-center justify-center rounded-full ring-1',
+        genderPillClass(gender),
+      ].join(' ')}
+      title={gender ? `คาเรกเตอร์: ${genderText(gender)}` : 'คาเรกเตอร์: ไม่ระบุ'}
+      aria-label={gender ? `คาเรกเตอร์: ${genderText(gender)}` : 'คาเรกเตอร์: ไม่ระบุ'}
+    >
+      {gender === 'MALE' ? (
+        <FaMale className="h-4 w-4" />
+      ) : gender === 'FEMALE' ? (
+        <FaFemale className="h-4 w-4" />
+      ) : (
+        <FaUser className="h-4 w-4" />
+      )}
+    </span>
+  );
+}
+
+function GenderPicker({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: '' | Gender;
+  onChange: (v: Gender) => void;
+  disabled?: boolean;
+}) {
+  const common =
+    'flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold ring-1 focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60';
+  const activeMale = value === 'MALE';
+  const activeFemale = value === 'FEMALE';
+  return (
+    <div className="mt-2 grid grid-cols-2 gap-3">
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => onChange('MALE')}
+        aria-pressed={activeMale}
+        className={[
+          common,
+          activeMale
+            ? 'bg-sky-50 text-sky-900 ring-sky-300 focus:ring-sky-400'
+            : 'bg-white text-slate-900 ring-slate-200 hover:bg-slate-50 focus:ring-slate-300',
+        ].join(' ')}
+      >
+        <FaMale className="h-4 w-4" />
+        ชาย
+      </button>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => onChange('FEMALE')}
+        aria-pressed={activeFemale}
+        className={[
+          common,
+          activeFemale
+            ? 'bg-rose-50 text-rose-900 ring-rose-300 focus:ring-rose-400'
+            : 'bg-white text-slate-900 ring-slate-200 hover:bg-slate-50 focus:ring-slate-300',
+        ].join(' ')}
+      >
+        <FaFemale className="h-4 w-4" />
+        หญิง
+      </button>
+    </div>
+  );
+}
+
 const DashboardPage = () => {
   const { data: session, status } = useSession();
 
@@ -64,14 +141,14 @@ const DashboardPage = () => {
   // Add form
   const [fullname, setFullname] = useState('');
   const [birthday, setBirthday] = useState('');
-  const [gender, setGender] = useState<'' | 'MALE' | 'FEMALE'>('');
+  const [gender, setGender] = useState<'' | Gender>('');
   const [addModalOpen, setAddModalOpen] = useState(false);
 
   // Edit row
   const [editingId, setEditingId] = useState<string>('');
   const [editFullname, setEditFullname] = useState('');
   const [editBirthday, setEditBirthday] = useState('');
-  const [editGender, setEditGender] = useState<'' | 'MALE' | 'FEMALE'>('');
+  const [editGender, setEditGender] = useState<'' | Gender>('');
   const [pendingDeleteId, setPendingDeleteId] = useState<string>('');
 
   const hasAutoOpenedAddModalRef = useRef(false);
@@ -79,12 +156,12 @@ const DashboardPage = () => {
   const childrenCount = childrenList.length;
 
   const canAdd = useMemo(() => {
-    return fullname.trim().length > 0 && Boolean(birthday);
-  }, [fullname, birthday]);
+    return fullname.trim().length > 0 && Boolean(birthday) && Boolean(gender);
+  }, [fullname, birthday, gender]);
 
   const canSaveEdit = useMemo(() => {
-    return editFullname.trim().length > 0 && Boolean(editBirthday);
-  }, [editFullname, editBirthday]);
+    return editFullname.trim().length > 0 && Boolean(editBirthday) && Boolean(editGender);
+  }, [editFullname, editBirthday, editGender]);
 
   const loadChildren = async ({ initial = false }: { initial?: boolean } = {}) => {
     setLoadingChildren(true);
@@ -132,7 +209,7 @@ const DashboardPage = () => {
   const onAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canAdd) {
-      setError('กรุณากรอกชื่อและวันเกิด');
+      setError('กรุณากรอกชื่อ วันเกิด และเลือกคาเรกเตอร์');
       return;
     }
 
@@ -146,7 +223,7 @@ const DashboardPage = () => {
         body: JSON.stringify({
           fullname,
           birthday,
-          gender: gender || undefined,
+          gender,
         }),
       });
       const data = (await res.json()) as { child?: ChildRow; error?: string };
@@ -200,7 +277,7 @@ const DashboardPage = () => {
 
   const onSaveEdit = async (id: string) => {
     if (!canSaveEdit) {
-      setError('กรุณากรอกชื่อและวันเกิดให้ถูกต้อง');
+      setError('กรุณากรอกชื่อ วันเกิด และเลือกคาเรกเตอร์ให้ถูกต้อง');
       return;
     }
 
@@ -214,7 +291,7 @@ const DashboardPage = () => {
         body: JSON.stringify({
           fullname: editFullname,
           birthday: editBirthday,
-          gender: editGender || undefined,
+          gender: editGender,
         }),
       });
       const data = (await res.json()) as { child?: ChildRow; error?: string };
@@ -392,7 +469,8 @@ const DashboardPage = () => {
                             className="rounded-2xl bg-white p-4 ring-1 ring-slate-200"
                           >
                             <div className="flex items-start justify-between gap-3">
-                              <div>
+                              <div className="flex items-center gap-3">
+                                <GenderAvatar gender={c.gender} />
                                 <div className="text-xs font-semibold text-slate-500">ชื่อ</div>
                                 <div className="mt-1 font-extrabold text-slate-900">
                                   {isEditing ? (
@@ -433,18 +511,11 @@ const DashboardPage = () => {
                                 <div className="text-xs font-semibold text-slate-500">เพศ</div>
                                 <div className="mt-1 text-slate-700">
                                   {isEditing ? (
-                                    <select
+                                    <GenderPicker
                                       value={editGender}
-                                      onChange={(e) =>
-                                        setEditGender(e.target.value as '' | 'MALE' | 'FEMALE')
-                                      }
-                                      className="mt-1 w-full rounded-xl bg-white px-3 py-2 text-sm text-slate-900 ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-400"
+                                      onChange={(v) => setEditGender(v)}
                                       disabled={rowBusy}
-                                    >
-                                      <option value="">ไม่ระบุ</option>
-                                      <option value="MALE">ชาย</option>
-                                      <option value="FEMALE">หญิง</option>
-                                    </select>
+                                    />
                                   ) : (
                                     genderText(c.gender)
                                   )}
@@ -561,7 +632,10 @@ const DashboardPage = () => {
                                   required
                                 />
                               ) : (
-                                <div className="font-semibold text-slate-900">{c.fullname}</div>
+                                <div className="flex items-center gap-3">
+                                  <GenderAvatar gender={c.gender} />
+                                  <div className="font-semibold text-slate-900">{c.fullname}</div>
+                                </div>
                               )}
                             </div>
 
@@ -582,18 +656,11 @@ const DashboardPage = () => {
 
                             <div className="col-span-2 pr-2 text-slate-700">
                               {isEditing ? (
-                                <select
+                                <GenderPicker
                                   value={editGender}
-                                  onChange={(e) =>
-                                    setEditGender(e.target.value as '' | 'MALE' | 'FEMALE')
-                                  }
-                                  className="w-full rounded-xl bg-white px-3 py-2 text-sm text-slate-900 ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-400"
+                                  onChange={(v) => setEditGender(v)}
                                   disabled={rowBusy}
-                                >
-                                  <option value="">ไม่ระบุ</option>
-                                  <option value="MALE">ชาย</option>
-                                  <option value="FEMALE">หญิง</option>
-                                </select>
+                                />
                               ) : (
                                 <span>{genderText(c.gender)}</span>
                               )}
@@ -749,17 +816,16 @@ const DashboardPage = () => {
                         </div>
                         <div>
                           <label className="text-sm font-semibold text-slate-700">
-                            เพศ (ไม่บังคับ)
+                            คาเรกเตอร์ (บังคับ)
                           </label>
-                          <select
+                          <GenderPicker
                             value={gender}
-                            onChange={(e) => setGender(e.target.value as '' | 'MALE' | 'FEMALE')}
-                            className="mt-2 w-full rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-700"
-                          >
-                            <option value="">ไม่ระบุ</option>
-                            <option value="MALE">ชาย</option>
-                            <option value="FEMALE">หญิง</option>
-                          </select>
+                            onChange={(v) => setGender(v)}
+                            disabled={adding || loadingChildren}
+                          />
+                          <div className="mt-2 text-xs text-slate-500">
+                            เลือกชายหรือหญิงเพื่อใช้เป็นคาเรกเตอร์ในรายการเด็ก
+                          </div>
                         </div>
                       </div>
 

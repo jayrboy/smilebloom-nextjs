@@ -30,13 +30,20 @@ export async function POST(request: Request) {
   const body = await request.json();
   const fullname = (body?.fullname ?? '').toString().trim();
   const birthdayRaw = (body?.birthday ?? '').toString();
-  const gender = body?.gender ? body.gender.toString() : undefined;
+  const genderRaw = body?.gender?.toString?.() ?? '';
+  const gender = genderRaw.trim();
 
   if (!fullname) {
     return NextResponse.json({ error: 'fullname is required' }, { status: 400 });
   }
   if (!birthdayRaw) {
     return NextResponse.json({ error: 'birthday is required' }, { status: 400 });
+  }
+  if (!gender) {
+    return NextResponse.json({ error: 'gender is required' }, { status: 400 });
+  }
+  if (gender !== 'MALE' && gender !== 'FEMALE') {
+    return NextResponse.json({ error: 'gender is invalid' }, { status: 400 });
   }
 
   const birthday = new Date(birthdayRaw);

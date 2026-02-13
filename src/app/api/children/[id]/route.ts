@@ -30,7 +30,14 @@ export async function PATCH(
     update.birthday = d;
   }
   if (b && b.gender !== undefined) {
-    update.gender = b.gender ? String(b.gender) : undefined;
+    const g = String(b.gender).trim();
+    if (!g) {
+      return NextResponse.json({ error: 'gender is required' }, { status: 400 });
+    }
+    if (g !== 'MALE' && g !== 'FEMALE') {
+      return NextResponse.json({ error: 'gender is invalid' }, { status: 400 });
+    }
+    update.gender = g;
   }
 
   await connectMongoDB();
