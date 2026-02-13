@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { GiHamburgerMenu } from "react-icons/gi"
 
 type NavItem = { label: string; href: `#${string}` };
 
@@ -106,9 +107,7 @@ export default function HomePage() {
                 aria-label="เปิดเมนู"
                 onClick={() => setMobileOpen((v) => !v)}
               >
-                <span className="h-0.5 w-5 bg-slate-700" />
-                <span className="h-0.5 w-5 bg-slate-700" />
-                <span className="h-0.5 w-5 bg-slate-700" />
+                <GiHamburgerMenu size={24} />
               </button>
 
               {/* <a href="#home" className="flex items-center gap-2">

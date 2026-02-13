@@ -5,6 +5,7 @@ import Navbar from '@/src/app/components/Navbar';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import MobileAppBar from '@/src/app/components/MobileAppBar';
+import { LuRefreshCcw } from "react-icons/lu";
 
 const DashboardPage = () => {
   const { data: session, status } = useSession();
@@ -82,9 +83,9 @@ const DashboardPage = () => {
               <button
                 type="button"
                 onClick={load}
-                className="rounded-full px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
+                className="rounded-full px-3 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
               >
-                รีเฟรช
+                <LuRefreshCcw className="w-4 h-4" />
               </button>
             )}
           </div>
