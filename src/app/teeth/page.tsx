@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
 
 import Navbar from '@/src/app/components/Navbar';
 import MobileAppBar from '@/src/app/components/MobileAppBar';
@@ -128,8 +127,6 @@ function getDeciduousLegendByCode(code: string): DeciduousLegend | null {
 
 const TeethPage = () => {
   const { data: session, status } = useSession();
-  const searchParams = useSearchParams();
-  const preferredChildId = (searchParams.get('childId') || '').trim();
   const [tab, setTab] = useState<TeethType>('DECIDUOUS');
   const [childrenList, setChildrenList] = useState<ChildRow[]>([]);
   const [selectedChildId, setSelectedChildId] = useState<string>('');
@@ -146,7 +143,7 @@ const TeethPage = () => {
 
   const childAgeMonths = useMemo(() => ageInMonths(selectedChild?.birthday), [selectedChild?.birthday]);
 
-  const loadChildren = async (opts?: { preferredChildId?: string }) => {
+  const loadChildren = async () => {
     setLoadingChildren(true);
     setError(null);
     try {
@@ -155,12 +152,7 @@ const TeethPage = () => {
       if (!res.ok) throw new Error(data?.error || 'โหลดรายการเด็กไม่สำเร็จ');
       const list = (data.children || []) as ChildRow[];
       setChildrenList(list);
-      const pref = (opts?.preferredChildId || '').trim();
-      if (pref && list.some((c) => c._id === pref)) {
-        setSelectedChildId(pref);
-      } else if (!selectedChildId && list.length > 0) {
-        setSelectedChildId(list[0]._id);
-      }
+      if (!selectedChildId && list.length > 0) setSelectedChildId(list[0]._id);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'เกิดข้อผิดพลาด');
     } finally {
@@ -205,21 +197,10 @@ const TeethPage = () => {
 
   useEffect(() => {
     if (status !== 'authenticated') return;
-    loadChildren({ preferredChildId });
+    loadChildren();
     loadTeeth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
-
-  useEffect(() => {
-    if (status !== 'authenticated') return;
-    if (!preferredChildId) return;
-    if (childrenList.some((c) => c._id === preferredChildId)) {
-      setSelectedChildId(preferredChildId);
-    } else {
-      loadChildren({ preferredChildId });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preferredChildId, status]);
 
   useEffect(() => {
     if (status !== 'authenticated') return;
