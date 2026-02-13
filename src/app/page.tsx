@@ -220,7 +220,7 @@ export default function HomePage() {
         >
           <div className="absolute inset-0">
             <Image
-              src="/teeth/smilebloom-bg.jpg"
+              src="https://img5.pic.in.th/file/secure-sv1/smilebloom-bg.jpg"
               alt="Smilebloom background"
               fill
               priority
@@ -280,8 +280,8 @@ export default function HomePage() {
 
             <div className="lg:col-span-6">
               <div className="grid gap-4 sm:grid-cols-2">
-                <ImageCard src="/teeth/teeth-bg1.jpg" alt="ทีมแพทย์และการให้บริการ" />
-                <ImageCard src="/teeth/teeth-bg.jpg" alt="บรรยากาศคลินิก" />
+                <ImageCard src="https://img5.pic.in.th/file/secure-sv1/teeth-bg1.jpg" alt="ทีมแพทย์และการให้บริการ" />
+                <ImageCard src="https://img2.pic.in.th/teeth-bg.jpg" alt="บรรยากาศคลินิก" />
               </div>
             </div>
           </div>
