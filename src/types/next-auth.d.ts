@@ -13,6 +13,7 @@ declare module 'next-auth' {
     id: string;
     username: string;
     role?: 'ADMIN' | 'USER';
+    remember?: boolean;
   }
 }
 
@@ -21,6 +22,7 @@ declare module 'next-auth/jwt' {
     id?: string;
     username?: string;
     role?: 'ADMIN' | 'USER';
+    remember?: boolean;
   }
 }
 

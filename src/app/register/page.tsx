@@ -200,7 +200,7 @@ const RegisterPage = () => {
                     href="/"
                     className="font-semibold text-slate-700 hover:text-slate-900"
                   >
-                    Home
+                    หน้าแรก
                   </Link>
                 </div>
               </form>
