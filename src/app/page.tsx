@@ -2,10 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 type NavItem = { label: string; href: `#${string}` };
-type ServiceItem = { name: string; desc: string };
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'หน้าแรก', href: '#home' },
@@ -13,17 +12,6 @@ const NAV_ITEMS: NavItem[] = [
   // { label: 'เวลาทำการ', href: '#hours' },
   // { label: 'ติดต่อ', href: '#contact' },
   // { label: 'เกี่ยวกับเรา', href: '#about' },
-];
-
-const SERVICES: ServiceItem[] = [
-  { name: 'ตรวจสุขภาพช่องปาก', desc: 'ประเมินสภาพฟันและเหงือก พร้อมคำแนะนำเฉพาะบุคคล' },
-  { name: 'ขูดหินปูน', desc: 'ทำความสะอาดคราบหินปูน ลดกลิ่นปากและเหงือกอักเสบ' },
-  { name: 'อุดฟัน', desc: 'ซ่อมแซมฟันผุให้กลับมาใช้งานได้ดีและสวยงาม' },
-  { name: 'ถอนฟัน', desc: 'หัตถการปลอดภัย พร้อมดูแลหลังทำอย่างใกล้ชิด' },
-  { name: 'จัดฟัน', desc: 'ปรับรอยยิ้มให้มั่นใจ ด้วยแผนการรักษาที่เหมาะสม' },
-  { name: 'ฟอกสีฟัน', desc: 'เพิ่มความขาวใสอย่างเป็นธรรมชาติและปลอดภัย' },
-  { name: 'ครอบฟัน/วีเนียร์', desc: 'งานบูรณะเพื่อความสวยงามและความแข็งแรงของฟัน' },
-  { name: 'รากฟันเทียม', desc: 'ทดแทนฟันที่หายไป ให้เคี้ยวได้ใกล้เคียงฟันธรรมชาติ' },
 ];
 
 function scrollToId(id: string) {
@@ -70,12 +58,6 @@ function ImageCard({
 export default function HomePage() {
   const [query, setQuery] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  const filteredServices = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return SERVICES;
-    return SERVICES.filter((s) => `${s.name} ${s.desc}`.toLowerCase().includes(q));
-  }, [query]);
 
   return (
     <div className="min-h-screen">
@@ -234,24 +216,26 @@ export default function HomePage() {
         {/* Home */}
         <section
           id="home"
-          className="relative overflow-hidden bg-gradient-to-br from-teal-700 via-emerald-700 to-teal-800"
+          className="relative overflow-hidden"
         >
-          <div className="absolute inset-0 opacity-30 [background:radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.55),transparent_45%),radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.35),transparent_40%)]" />
-          <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20">
+          <div className="absolute inset-0">
+            <Image
+              src="https://img5.pic.in.th/file/secure-sv1/smilebloom-bg.jpg"
+              alt="Smilebloom background"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-center"
+            />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-br from-teal-950/70 via-emerald-950/60 to-teal-950/75" />
+          <div className="absolute inset-0 opacity-25 [background:radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.55),transparent_45%),radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.35),transparent_40%)]" />
+
+          <div className="relative z-10 mx-auto max-w-6xl px-4 py-16 sm:py-20">
             <div className="mx-auto max-w-2xl text-center text-white">
               <h1 className="text-balance text-3xl font-extrabold tracking-tight sm:text-5xl">
                 Smilebloom
               </h1>
-              <br />
-              <div className="mx-auto mb-6 flex w-fit items-center justify-center rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/20">
-                <Image
-                  src="/teeth/deciduous-eruption.png"
-                  alt="Teeth"
-                  width={1000}
-                  height={600}
-                  className="h-auto w-full object-contain"
-                />
-              </div>
               <p className="mt-4 text-pretty text-sm text-white/90 sm:text-base">
                 เว็บแอปสำหรับติดตามลำดับการขึ้นของฟัน
                 <br className="hidden sm:block" />
@@ -260,8 +244,8 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="h-2 w-full bg-white/15" />
-          <div className="h-2 w-full bg-white/10" />
+          <div className="relative z-10 h-2 w-full bg-white/15" />
+          <div className="relative z-10 h-2 w-full bg-white/10" />
         </section>
 
         {/* Introduction */}
@@ -296,8 +280,8 @@ export default function HomePage() {
 
             <div className="lg:col-span-6">
               <div className="grid gap-4 sm:grid-cols-2">
-                <ImageCard src="/teeth/teeth-img.png" alt="บรรยากาศคลินิก" />
-                <ImageCard src="/teeth/teeth-img.png" alt="ทีมแพทย์และการให้บริการ" />
+                <ImageCard src="https://img5.pic.in.th/file/secure-sv1/teeth-bg1.jpg" alt="ทีมแพทย์และการให้บริการ" />
+                <ImageCard src="https://img2.pic.in.th/teeth-bg.jpg" alt="บรรยากาศคลินิก" />
               </div>
             </div>
           </div>
