@@ -218,11 +218,11 @@ export function TeethQuadrantProgress({
       </div>
 
       <div className="relative overflow-hidden rounded-3xl bg-slate-50 ring-1 ring-slate-200">
-        <img
-          src={imageUrl}
-          alt="teeth quadrant overview"
-          className="block h-auto w-full select-none object-contain filter grayscale"
-        />
+          <img
+            src={imageUrl}
+            alt="teeth quadrant overview"
+            className="block h-auto w-full select-none object-contain filter grayscale"
+          />
 
         {/* Tooth frames (20 teeth) - positionable via x/y/w/h */}
         <div className="pointer-events-none absolute inset-0">
