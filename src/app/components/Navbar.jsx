@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { GiHamburgerMenu } from "react-icons/gi"
+import Image from 'next/image';
 
 const Navbar = ({ session }) => {
   const [loading, setLoading] = useState(false);
@@ -44,7 +45,7 @@ const Navbar = ({ session }) => {
   return (
     <>
       <header className="sticky top-0 z-50">
-        <div className="bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+        <div className="bg-white/8 backdrop-blur supports-[backdrop-filter]:bg-white/60">
           <div className="mx-auto max-w-6xl px-4">
             <div className="flex items-center justify-between gap-3 py-3">
               <button
@@ -59,6 +60,7 @@ const Navbar = ({ session }) => {
               <span className="text-xl font-extrabold tracking-tight text-slate-900">
                 Smilebloom
               </span>
+              <Image src="/home/teeth_icon.png" alt="Smilebloom" width={120} height={44} className="h-9 w-auto" />
 
               {/* <Link href="/" className="flex items-center gap-2">
                 <Image

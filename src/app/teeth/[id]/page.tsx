@@ -391,13 +391,23 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
             </section>
 
             {/* Saved quadrants overview */}
-            <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
-              <TeethQuadrantProgress
-                imageUrl="https://img5.pic.in.th/file/secure-sv1/teethf064f9fae365c8c9.png"
+            <div className="grid gap-6 lg:grid-cols-2">
+              <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+                <TeethQuadrantProgress
+                  imageUrl="https://img5.pic.in.th/file/secure-sv1/teethf064f9fae365c8c9.png"
+                  teethList={teethList}
+                  events={events}
+                />
+              </section>
+  
+              <TeethEvent
+                childId={childId}
+                teethType={tab}
                 teethList={teethList}
                 events={events}
+                onReload={() => loadEvents(childId)}
               />
-            </section>
+            </div>
 
             <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -506,14 +516,6 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
 
               {loadingTeeth && <div className="mt-4 text-sm text-slate-500">กำลังโหลดข้อมูลลำดับฟัน...</div>}
             </section>
-
-            <TeethEvent
-              childId={childId}
-              teethType={tab}
-              teethList={teethList}
-              events={events}
-              onReload={() => loadEvents(childId)}
-            />
 
             {pageBusy && <div className="text-center text-sm text-slate-500">กำลังโหลดข้อมูล...</div>}
           </div>

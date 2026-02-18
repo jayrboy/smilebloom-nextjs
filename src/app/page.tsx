@@ -98,7 +98,7 @@ export default function HomePage() {
           </div>
         </div> */}
 
-        <div className="bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+        <div>
           <div className="mx-auto max-w-6xl px-4">
             <div className="flex items-center justify-between gap-3 py-3">
               <button
@@ -121,12 +121,12 @@ export default function HomePage() {
                 />
               </a> */}
 
-              <nav className="hidden items-center gap-6 text-sm text-slate-700 lg:flex">
+              <nav className="hidden items-center gap-6 text-base font-semibold text-white lg:flex">
                 {NAV_ITEMS.map((item) => (
                   <a
                     key={item.href}
                     href={item.href}
-                    className="hover:text-slate-900"
+                    className="hover:text-teal-800"
                   >
                     {item.label}
                   </a>
@@ -159,7 +159,7 @@ export default function HomePage() {
 
                 <Link
                   href="/auth/login"
-                  className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-slate-200 hover:bg-slate-50"
+                  className="rounded-full px-4 py-2 text-base font-semibold text-white ring-1 ring-slate-200 hover:bg-teal-800"
                 >
                   ลงชื่อเข้าใช้
                 </Link>
@@ -217,7 +217,7 @@ export default function HomePage() {
           id="home"
           className="relative overflow-hidden"
         >
-          <div className="absolute inset-0">
+          {/* <div className="absolute inset-0">
             <Image
               src="https://img5.pic.in.th/file/secure-sv1/smilebloom-bg.jpg"
               alt="Smilebloom background"
@@ -226,7 +226,7 @@ export default function HomePage() {
               sizes="100vw"
               className="object-cover object-center"
             />
-          </div>
+          </div> */}
           <div className="absolute inset-0 bg-gradient-to-br from-teal-950/70 via-emerald-950/60 to-teal-950/75" />
           <div className="absolute inset-0 opacity-25 [background:radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.55),transparent_45%),radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.35),transparent_40%)]" />
 
@@ -235,11 +235,11 @@ export default function HomePage() {
               <h1 className="text-balance text-3xl font-extrabold tracking-tight sm:text-5xl">
                 Smilebloom
               </h1>
-              <p className="mt-4 text-pretty text-sm text-white/90 sm:text-base">
-                เว็บแอปสำหรับติดตามลำดับการขึ้นของฟัน
+              <h2 className="mt-4 text-white">
+                เว็บแอปพลิเคชันช่วยบันทึกการเจริญเติบโตของฟันและสุขภาพฟัน
                 <br className="hidden sm:block" />
-                และบันทึกเหตุการณ์ล่าสุด
-              </p>
+                เพื่อผู้ปกครองและคุณหนู
+              </h2>
             </div>
           </div>
 
@@ -251,37 +251,38 @@ export default function HomePage() {
         <section className="mx-auto max-w-6xl px-4 py-14 sm:py-16">
           <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
             <div className="lg:col-span-6">
-              <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-                ยิ้มสวย สุขภาพดี เริ่มได้ที่นี่
+              <h2 className="text-2xl font-extrabold tracking-tight text-white text-center">
+                เว็บไซต์นี้เป็นส่วนหนึ่งของโครงการศึกษาความรอบรู้<br/>
+                เฉพาะเรื่อง (senior project)<br/>
+                นางสาว สุชนาธร สีสุขดี
               </h2>
-              <p className="mt-4 text-sm leading-7 text-slate-600">
+              {/* <p className="mt-4 text-sm leading-7 text-slate-600">
                 สร้างสรรค์เว็บแอปสำหรับติดตามลำดับการขึ้นของฟันน้ำนมและบันทึกเหตุการณ์ล่าสุด
-              </p>
+              </p> */}
 
-              <div className="mt-6 rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
-                <p className="text-sm font-semibold text-slate-900">ฟีเจอร์หลัก</p>
-                <ul className="mt-3 space-y-2 text-sm text-slate-700">
+              <div className="mt-6 rounded-2xl p-5" style={{ backgroundColor: '#448575' }}>
+                <p className="text-sm font-semibold text-white">ฟีเจอร์หลัก</p>
+                <ul className="mt-3 space-y-2 text-sm text-white">
                   <li className="flex gap-2">
-                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-rose-500" />
-                    สมัครสมาชิก / เข้าสู่ระบบ
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-rose-500" />
+                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-white" />
                     ติดตามลำดับการขึ้นของฟันน้ำนม
                   </li>
                   <li className="flex gap-2">
-                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-rose-500" />
-                    บันทึกเหตุการณ์ล่าสุด
+                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-white" />
+                    อำนวยความสะดวกในการพบทันตแพทย์
                   </li>
                 </ul>
               </div>
             </div>
 
             <div className="lg:col-span-6">
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-1">
+                <Image src="/home/love-home.png" alt="ทีมแพทย์และการให้บริการ" width={1200} height={650} />
+              </div>
+              {/* <div className="grid gap-4 sm:grid-cols-2">
                 <ImageCard src="https://img5.pic.in.th/file/secure-sv1/teeth-bg1.jpg" alt="ทีมแพทย์และการให้บริการ" />
                 <ImageCard src="https://img2.pic.in.th/teeth-bg.jpg" alt="บรรยากาศคลินิก" />
-              </div>
+              </div> */}
             </div>
           </div>
         </section>

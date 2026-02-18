@@ -79,9 +79,9 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen">
       <div className="relative isolate">
-        <div className="absolute inset-0 -z-20" aria-hidden="true">
+        {/* <div className="absolute inset-0 -z-20" aria-hidden="true">
           <Image
             src="https://img5.pic.in.th/file/secure-sv1/smilebloom-bg.jpg"
             alt=""
@@ -90,7 +90,7 @@ const LoginPage = () => {
             sizes="100vw"
             className="object-cover object-center brightness-75 saturate-125"
           />
-        </div>
+        </div> */}
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-teal-950/70 via-emerald-950/55 to-slate-950/75" />
         <div className="absolute inset-0 -z-10 opacity-25 [background:radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.50),transparent_45%),radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.28),transparent_40%)]" />
 

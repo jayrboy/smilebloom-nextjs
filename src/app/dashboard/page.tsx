@@ -341,7 +341,7 @@ const DashboardPage = () => {
             <div>
               <div className="text-sm font-semibold text-slate-500">Children</div>
               <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-                เพิ่มข้อมูลเด็ก & รายการเด็ก
+                เพิ่มข้อมูลบุตรหลานของท่าน
               </h1>
               <p className="mt-2 text-sm text-slate-600">
                 เพิ่ม แก้ไข และลบข้อมูลเด็กในบัญชีคุณ
@@ -435,14 +435,14 @@ const DashboardPage = () => {
                     >
                       + เพิ่มเด็ก
                     </button>
-                    <button
+                    {/* <button
                       type="button"
                       onClick={() => loadChildren({ initial: false })}
                       disabled={loadingChildren}
                       className="rounded-full px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       <LuRefreshCcw className="w-4 h-4" />
-                    </button>
+                    </button> */}
                   </div>
                 </div>
 
