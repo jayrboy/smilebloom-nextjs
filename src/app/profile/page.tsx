@@ -12,15 +12,16 @@ type ProfileUser = {
   email?: string;
   role?: 'ADMIN' | 'USER';
   status?: 'ACTIVE' | 'INACTIVE';
+  dentistName?: string;
+  dentistDay?: string; // YYYY-MM-DD (date-only)
+  dentistHistory?: Array<{
+    dentistName?: string;
+    dentistDay: string;
+    savedAt?: string;
+  }>;
   createdAt?: string;
   updatedAt?: string;
 };
-
-function isValidEmail(email: string) {
-  const e = email.trim().toLowerCase();
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return Boolean(e) && e.length <= 254 && re.test(e);
-}
 
 function formatDateTime(value?: string) {
   if (!value) return '-';
@@ -34,18 +35,32 @@ function formatDateTime(value?: string) {
   return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
 }
 
+function diffDaysFromTodayDateOnly(dateOnly: string) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateOnly);
+  if (!m) return null;
+  const y = Number(m[1]);
+  const mo = Number(m[2]);
+  const d = Number(m[3]);
+  if (!Number.isFinite(y) || !Number.isFinite(mo) || !Number.isFinite(d)) return null;
+  const now = new Date();
+  const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const targetUTC = Date.UTC(y, mo - 1, d);
+  const diffDays = Math.round((targetUTC - todayUTC) / 86400000);
+  return diffDays;
+}
+
 const ProfilePage = () => {
   const { data: session, status } = useSession();
   const username = session?.user?.username;
 
   const [user, setUser] = useState<ProfileUser | null>(null);
-  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const canSave = useMemo(() => isValidEmail(email), [email]);
+  const [dentistName, setDentistName] = useState('');
+  const [dentistDay, setDentistDay] = useState(''); // YYYY-MM-DD
 
   const load = async () => {
     setLoading(true);
@@ -57,7 +72,8 @@ const ProfilePage = () => {
       if (!res.ok) throw new Error(data?.error || 'โหลดข้อมูลโปรไฟล์ไม่สำเร็จ');
 
       setUser(data.user || null);
-      setEmail(data.user?.email || '');
+      setDentistName(data.user?.dentistName || '');
+      setDentistDay(data.user?.dentistDay || '');
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'เกิดข้อผิดพลาด');
     } finally {
@@ -67,10 +83,6 @@ const ProfilePage = () => {
 
   const onSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canSave) {
-      setError('กรุณากรอกอีเมลให้ถูกต้อง');
-      return;
-    }
 
     setSaving(true);
     setError(null);
@@ -79,7 +91,10 @@ const ProfilePage = () => {
       const res = await fetch('/api/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({
+          dentistName: dentistName.trim(),
+          dentistDay: dentistDay.trim(),
+        }),
       });
       const data = (await res.json()) as { user?: ProfileUser; error?: string };
       if (!res.ok) throw new Error(data?.error || 'บันทึกไม่สำเร็จ');
@@ -92,6 +107,27 @@ const ProfilePage = () => {
       setSaving(false);
     }
   };
+
+  const hasChanges = useMemo(() => {
+    const baseName = user?.dentistName || '';
+    const baseDay = user?.dentistDay || '';
+    return dentistName.trim() !== baseName || dentistDay.trim() !== baseDay;
+  }, [dentistName, dentistDay, user?.dentistName, user?.dentistDay]);
+
+  const dentistDayHint = useMemo(() => {
+    const v = dentistDay.trim();
+    if (!v) return 'เลือกวันนัดเพื่อตรวจคำนวณจำนวนวัน';
+    const diff = diffDaysFromTodayDateOnly(v);
+    if (diff === null) return 'รูปแบบวันที่ไม่ถูกต้อง';
+    if (diff === 0) return 'นัดครั้งต่อไป วันนี้';
+    if (diff > 0) return `นัดครั้งต่อไป ในอีก ${diff} วัน`;
+    return `ผ่านมาแล้ว ${Math.abs(diff)} วัน`;
+  }, [dentistDay]);
+
+  const dentistHistory = useMemo(() => {
+    const list = user?.dentistHistory ?? [];
+    return [...list].reverse();
+  }, [user?.dentistHistory]);
 
   useEffect(() => {
     if (status !== 'authenticated') return;
@@ -201,10 +237,10 @@ const ProfilePage = () => {
                     <div>
                       <div className="text-sm font-semibold text-slate-500">Edit profile</div>
                       <h2 className="mt-1 text-lg font-extrabold tracking-tight text-slate-900">
-                        แก้ไขข้อมูลเบื้องต้น
+                        ข้อมูลหมอฟัน
                       </h2>
                       <p className="mt-1 text-sm text-slate-600">
-                        เปลี่ยนอีเมลสำหรับการติดต่อ (บันทึกลงระบบ)
+                        บันทึกชื่อทัตแพทย์ประจำและวันนัดครั้งถัดไป
                       </p>
                     </div>
                     {loading && <div className="text-sm font-semibold text-slate-500">กำลังโหลด…</div>}
@@ -212,29 +248,36 @@ const ProfilePage = () => {
 
                   <form onSubmit={onSave} className="mt-5 grid gap-4">
                     <div>
-                      <label className="text-sm font-semibold text-slate-700">Email</label>
+                      <label className="text-sm font-semibold text-slate-700">ทัตแพทย์ประจำ</label>
                       <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="name@example.com"
+                        type="text"
+                        value={dentistName}
+                        onChange={(e) => setDentistName(e.target.value)}
+                        placeholder="ชื่อคุณหมอ"
                         className="mt-2 w-full rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 ring-1 ring-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-400"
-                        autoComplete="email"
+                        autoComplete="off"
                       />
-                      <div className="mt-2 text-xs text-slate-500">
-                        {email.trim()
-                          ? canSave
-                            ? 'รูปแบบอีเมลถูกต้อง'
-                            : 'รูปแบบอีเมลไม่ถูกต้อง'
-                          : 'กรอกอีเมลเพื่อบันทึก'}
-                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-semibold text-slate-700">
+                        DENTIST DAY <span className="text-slate-400">(นัดครั้งต่อไป)</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={dentistDay}
+                        onChange={(e) => setDentistDay(e.target.value)}
+                        className="mt-2 w-full rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 ring-1 ring-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-400"
+                      />
+                      <div className="mt-2 text-xs text-slate-500">{dentistDayHint}</div>
                     </div>
 
                     <div className="flex items-center justify-end gap-2">
                       <button
                         type="button"
                         onClick={() => {
-                          setEmail(user?.email || '');
+                          setDentistName(user?.dentistName || '');
+                          setDentistDay(user?.dentistDay || '');
                           setError(null);
                           setMessage(null);
                         }}
@@ -244,13 +287,63 @@ const ProfilePage = () => {
                       </button>
                       <button
                         type="submit"
-                        disabled={saving || loading || !canSave}
+                        disabled={saving || loading || !hasChanges}
                         className="rounded-full bg-slate-900 px-5 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {saving ? 'กำลังบันทึก...' : 'บันทึก'}
                       </button>
                     </div>
                   </form>
+
+                  <div className="mt-6 border-t border-slate-100 pt-5">
+                    <div className="flex flex-wrap items-end justify-between gap-2">
+                      <div>
+                        <div className="text-sm font-semibold text-slate-500">History</div>
+                        <div className="mt-1 text-lg font-extrabold tracking-tight text-slate-900">
+                          ประวัติการบันทึก
+                        </div>
+                      </div>
+                      <div className="text-xs text-slate-500">เก็บล่าสุด 50 รายการ</div>
+                    </div>
+
+                    {dentistHistory.length === 0 ? (
+                      <div className="mt-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600 ring-1 ring-slate-100">
+                        ยังไม่มีประวัติการบันทึก
+                      </div>
+                    ) : (
+                      <div className="mt-3 grid gap-2">
+                        {dentistHistory.map((h, idx) => {
+                          const diff = diffDaysFromTodayDateOnly(h.dentistDay);
+                          const relative =
+                            diff === null
+                              ? '-'
+                              : diff === 0
+                                ? 'วันนี้'
+                                : diff > 0
+                                  ? `ในอีก ${diff} วัน`
+                                  : `ผ่านมาแล้ว ${Math.abs(diff)} วัน`;
+
+                          return (
+                            <div
+                              key={`${h.savedAt ?? idx}-${h.dentistDay}`}
+                              className="rounded-2xl bg-white px-4 py-3 text-sm ring-1 ring-slate-100"
+                            >
+                              <div className="flex flex-wrap items-center justify-between gap-2">
+                                <div className="font-semibold text-slate-900">
+                                  {h.dentistDay}{' '}
+                                  <span className="font-normal text-slate-500">({relative})</span>
+                                </div>
+                                <div className="text-xs text-slate-500">{formatDateTime(h.savedAt)}</div>
+                              </div>
+                              <div className="mt-1 text-xs text-slate-600">
+                                ทัตแพทย์ประจำ: <span className="font-semibold text-slate-700">{h.dentistName || '-'}</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </section>
               </div>
             </div>

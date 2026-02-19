@@ -1,5 +1,25 @@
 import mongoose from 'mongoose';
 
+const dentistHistorySchema = new mongoose.Schema(
+  {
+    dentistName: {
+      type: String,
+      trim: true,
+    },
+    // Date-only in format YYYY-MM-DD
+    dentistDay: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    savedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { _id: false }
+);
+
 const userSchema = new mongoose.Schema(
   {
     username: {
@@ -35,6 +55,19 @@ const userSchema = new mongoose.Schema(
     },
     google_user_id: {
       type: String,
+    },
+    dentistName: {
+      type: String,
+      trim: true,
+    },
+    // Date-only in format YYYY-MM-DD to avoid timezone drift in UI
+    dentistDay: {
+      type: String,
+      trim: true,
+    },
+    dentistHistory: {
+      type: [dentistHistorySchema],
+      default: [],
     },
   },
   { timestamps: true }
