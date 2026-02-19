@@ -250,7 +250,7 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
   return (
     <div className="min-h-screen">
       <Navbar session={session} />
-     <div className="bg-slate-50">
+     <div>
         <div className="mx-auto max-w-6xl px-4 py-8 pb-24 lg:pb-10">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>

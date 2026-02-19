@@ -101,7 +101,7 @@ const ProfilePage = () => {
   return (
     <>
       <Navbar session={session} />
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen">
         <div className="mx-auto max-w-6xl px-4 py-8 pb-24 lg:pb-10">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
@@ -114,7 +114,7 @@ const ProfilePage = () => {
               </p>
             </div>
 
-            {status === 'authenticated' && (
+            {/* {status === 'authenticated' && (
               <button
                 type="button"
                 onClick={load}
@@ -122,7 +122,7 @@ const ProfilePage = () => {
               >
                 รีเฟรช
               </button>
-            )}
+            )} */}
           </div>
 
           {status === 'loading' && (

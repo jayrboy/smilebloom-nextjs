@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { GiHamburgerMenu } from "react-icons/gi"
+import { TbLogout } from "react-icons/tb";
 import Image from 'next/image';
 
 const Navbar = ({ session }) => {
@@ -33,6 +34,12 @@ const Navbar = ({ session }) => {
   const handleLogout = async () => {
     setLoading(true);
 
+    const confirm = window.confirm('คุณต้องการออกจากระบบหรือไม่?');
+    if (!confirm) {
+      setLoading(false);
+      return;
+    }
+
     try {
       await signOut({ redirect: false });
       router.replace('/auth/login');
@@ -45,7 +52,7 @@ const Navbar = ({ session }) => {
   return (
     <>
       <header className="sticky top-0 z-50">
-        <div className="bg-white/8 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+        <div className="backdrop-blur" style={{ backgroundColor: '#448575' }}>
           <div className="mx-auto max-w-6xl px-4">
             <div className="flex items-center justify-between gap-3 py-3">
               <button
@@ -78,7 +85,7 @@ const Navbar = ({ session }) => {
                   <Link
                     key={`${item.label}-${item.href}`}
                     href={item.href}
-                    className="rounded-xl px-3 py-2 font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                    className="rounded-xl px-3 py-2 font-semibold text-white hover:bg-slate-100 hover:text-slate-900"
                   >
                     {item.label}
                   </Link>
@@ -93,7 +100,7 @@ const Navbar = ({ session }) => {
                     disabled={loading}
                     className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-slate-200 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {loading ? 'กำลังออกจากระบบ...' : 'ออกจากระบบ'}
+                    {loading ? 'กำลังออกจากระบบ...' : <TbLogout size={20} />}
                   </button>
                 ) : (
                   <Link
