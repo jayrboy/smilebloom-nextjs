@@ -335,15 +335,15 @@ const DashboardPage = () => {
   return (
     <>
       <Navbar session={session} />
-      <div className="min-h-screen">
+      <div className="min-h-screen" style={{ backgroundColor: '#448575' }}>
         <div className="mx-auto max-w-6xl px-4 py-8 pb-24 lg:pb-10">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <div className="text-sm font-semibold text-slate-500">Children</div>
-              <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+              <div className="text-sm font-semibold">Children</div>
+              <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
                 เพิ่มข้อมูลบุตรหลานของท่าน
               </h1>
-              <p className="mt-2 text-sm text-slate-600">
+              <p className="mt-2 text-sm text-white">
                 เพิ่ม แก้ไข และลบข้อมูลเด็กในบัญชีคุณ
               </p>
             </div>

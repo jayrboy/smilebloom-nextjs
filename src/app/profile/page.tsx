@@ -137,9 +137,9 @@ const ProfilePage = () => {
   return (
     <>
       <Navbar session={session} />
-      <div className="min-h-screen">
+      <div className="min-h-screen" style={{ backgroundColor: '#448575' }}>
         <div className="mx-auto max-w-6xl px-4 py-8 pb-24 lg:pb-10">
-          <div className="flex flex-wrap items-end justify-between gap-3">
+          {/* <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <div className="text-sm font-semibold text-slate-500">Profile</div>
               <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
@@ -150,7 +150,7 @@ const ProfilePage = () => {
               </p>
             </div>
 
-            {/* {status === 'authenticated' && (
+            {status === 'authenticated' && (
               <button
                 type="button"
                 onClick={load}
@@ -158,8 +158,8 @@ const ProfilePage = () => {
               >
                 รีเฟรช
               </button>
-            )} */}
-          </div>
+            )}
+          </div> */}
 
           {status === 'loading' && (
             <div className="mt-6 rounded-2xl bg-white p-5 text-sm text-slate-600 ring-1 ring-black/5">
@@ -208,8 +208,8 @@ const ProfilePage = () => {
                 </div>
               )}
 
-              <div className="grid gap-4 lg:grid-cols-3">
-                <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5 lg:col-span-1">
+              <div className="grid gap-4 lg:grid-cols-2">
+                {/* <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5 lg:col-span-1">
                   <div className="text-sm font-semibold text-slate-500">Account</div>
                   <div className="mt-2 text-lg font-extrabold tracking-tight text-slate-900">
                     {username || user?.username || '-'}
@@ -230,16 +230,16 @@ const ProfilePage = () => {
                       </span>
                     </div>
                   </div>
-                </section>
+                </section> */}
 
-                <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5 lg:col-span-2">
+                <section>
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <div className="text-sm font-semibold text-slate-500">Edit profile</div>
-                      <h2 className="mt-1 text-lg font-extrabold tracking-tight text-slate-900">
+                      <div className="text-sm font-semibold">Edit profile</div>
+                      <h2 className="mt-1 text-lg font-extrabold tracking-tight text-white">
                         ข้อมูลหมอฟัน
                       </h2>
-                      <p className="mt-1 text-sm text-slate-600">
+                      <p className="mt-1 text-sm text-white">
                         บันทึกชื่อทัตแพทย์ประจำและวันนัดครั้งถัดไป
                       </p>
                     </div>
@@ -248,7 +248,7 @@ const ProfilePage = () => {
 
                   <form onSubmit={onSave} className="mt-5 grid gap-4">
                     <div>
-                      <label className="text-sm font-semibold text-slate-700">ทัตแพทย์ประจำ</label>
+                      <label className="text-sm font-semibold text-white">ทัตแพทย์ประจำ</label>
                       <input
                         type="text"
                         value={dentistName}
@@ -260,16 +260,16 @@ const ProfilePage = () => {
                     </div>
 
                     <div>
-                      <label className="text-sm font-semibold text-slate-700">
-                        DENTIST DAY <span className="text-slate-400">(นัดครั้งต่อไป)</span>
+                      <label className="text-sm font-semibold text-white">
+                        DENTIST DAY <span className="text-white">(นัดครั้งต่อไป)</span>
                       </label>
                       <input
                         type="date"
                         value={dentistDay}
                         onChange={(e) => setDentistDay(e.target.value)}
-                        className="mt-2 w-full rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 ring-1 ring-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-400"
+                        className="mt-2 w-full rounded-2xl bg-white px-4 py-3 text-sm text- ring-1 ring-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-400"
                       />
-                      <div className="mt-2 text-xs text-slate-500">{dentistDayHint}</div>
+                      <div className="mt-2 text-xs text-white"><b>{dentistDayHint}</b></div>
                     </div>
 
                     <div className="flex items-center justify-end gap-2">
@@ -298,8 +298,8 @@ const ProfilePage = () => {
                   <div className="mt-6 border-t border-slate-100 pt-5">
                     <div className="flex flex-wrap items-end justify-between gap-2">
                       <div>
-                        <div className="text-sm font-semibold text-slate-500">History</div>
-                        <div className="mt-1 text-lg font-extrabold tracking-tight text-slate-900">
+                        <div className="text-sm font-semibold">History</div>
+                        <div className="mt-1 text-lg font-extrabold tracking-tight text-white">
                           ประวัติการบันทึก
                         </div>
                       </div>

@@ -52,7 +52,7 @@ const Navbar = ({ session }) => {
   return (
     <>
       <header className="sticky top-0 z-50">
-        <div className="backdrop-blur" style={{ backgroundColor: '#448575' }}>
+        <div className="backdrop-blur" style={{ backgroundColor: '#8DD7BF' }}>
           <div className="mx-auto max-w-6xl px-4">
             <div className="flex items-center justify-between gap-3 py-3">
               <button
@@ -64,7 +64,7 @@ const Navbar = ({ session }) => {
                 <GiHamburgerMenu size={24} />
               </button>
 
-              <span className="text-xl font-extrabold tracking-tight text-slate-900">
+              <span className="text-xl font-extrabold tracking-tight text-white">
                 Smilebloom
               </span>
               <Image src="/home/teeth_icon.png" alt="Smilebloom" width={120} height={44} className="h-9 w-auto" />
