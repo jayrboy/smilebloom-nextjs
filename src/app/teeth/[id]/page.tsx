@@ -376,7 +376,7 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
                   <div className="lg:col-span-7">
                     <div className="relative overflow-hidden rounded-3xl bg-slate-50 ring-1 ring-slate-200">
                       <Image
-                        src="/teeth/deciduous-eruption.png"
+                        src="/teeth/intro.jpg"
                         alt="ลำดับการขึ้นของฟันน้ำนม"
                         width={1200}
                         height={650}
