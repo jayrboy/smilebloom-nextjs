@@ -2,25 +2,28 @@
 
 ## ภาพรวม (Overview)
 
-**TH**: Smilebloom คือเว็บแอปสำหรับติดตาม “ลำดับการขึ้นของฟัน” และบันทึกเหตุการณ์ (event log) ต่อเด็กแต่ละคน พร้อมหน้า Dashboard สรุปภาพรวม และหน้า Profile สำหรับแก้ไขข้อมูลเบื้องต้น
-
-**EN**: Smilebloom is a web app to track tooth eruption timelines and log events per child, with a summary dashboard and an editable profile page.
+Smilebloom คือเว็บแอปสำหรับติดตาม “ลำดับการขึ้นของฟัน” และบันทึกเหตุการณ์ (event log) ต่อเด็กแต่ละคน พร้อมหน้า Dashboard สรุปภาพรวม และหน้า Profile สำหรับแก้ไขข้อมูลเบื้องต้น
 
 ### เทคโนโลยีที่ใช้ (Tech stack)
 
-- Next.js (App Router) + TypeScript + TailwindCSS
-- NextAuth (Credentials)
-- MongoDB + Mongoose
+- Next.js คือ React Framework สำหรับสร้างเว็บแอปพลิเคชัน
+  - App Router : ใช้สำหรับจัดการเส้นทางของเว็บแอปพลิเคชัน
+  - TypeScript : ใช้สำหรับตรวจสอบชนิดของตัวแปร
+  - TailwindCSS : ใช้สำหรับจัดการรูปแบบ ความสวยงามของเว็บแอปพลิเคชัน
+- NextAuth (Credentials) : ใช้สำหรับจัดการยืนยันตัวตนก่อนเข้าสู่ระบบ
+- MongoDB + Mongoose : ใช้สำหรับจัดการฐานข้อมูลบน Cloud
 
 ## ฟีเจอร์ (Features)
 
 **TH**
+
 - สมัครสมาชิก / เข้าสู่ระบบ
-- Dashboard: ดูจำนวนเด็ก + เหตุการณ์ล่าสุด
-- Teeth: ดูลำดับการขึ้นฟัน (ฟันน้ำนม/ฟันแท้) + บันทึกเหตุการณ์
-- Profile: แก้ไขอีเมล (บันทึกลง MongoDB)
+- Dashboard: ดูจำนวนเด็ก
+- Teeth: ดูลำดับการขึ้นฟัน (ฟันน้ำนม) + บันทึกเหตุการณ์
+- Profile: นัดทันตแพทย์ (บันทึกลงฐานข้อมูล MongoDB)
 
 **EN**
+
 - Register / Login
 - Dashboard: children count + recent events
 - Teeth: deciduous/permanent timeline + event log
@@ -29,10 +32,12 @@
 ## ข้อกำหนด (Requirements)
 
 **TH**
+
 - Node.js 20+ (แนะนำ)
 - Docker (ถ้าจะรันผ่าน docker compose)
 
 **EN**
+
 - Node.js 20+ recommended
 - Docker (optional, for docker compose)
 
@@ -109,10 +114,12 @@ docker run --rm -p 80:3000 --env-file .env smilebloom
 ### Docker Compose (Next.js + Nginx)
 
 **TH**: โปรเจกต์นี้รันแบบ 2 services:
+
 - `app`: Next.js (build + start) ฟังที่ `3000`
 - `nginx`: reverse proxy รับที่ `80` แล้วส่งต่อไป `app:3000`
 
 **EN**: This project runs 2 services:
+
 - `app`: Next.js (build + start) on `3000`
 - `nginx`: reverse proxy on `80` → `app:3000`
 
@@ -148,23 +155,23 @@ docker compose down
 
 ### สมัครสมาชิก (Register)
 
-- ไปที่ `GET /register`
+- ไปที่หน้าลงทะเบียน
 - กรอก `username` + `password` แล้วสมัครสมาชิก
 
 ### เข้าสู่ระบบ (Login)
 
-- ไปที่ `GET /auth/login`
+- ไปที่หน้าเข้าสู่ระบบ
 - ล็อกอินด้วย `username` + `password`
 
 ### Dashboard
 
-- ไปที่ `GET /dashboard`
+- ไปที่หน้าแดชบอร์ด
 - ดูสรุปจำนวนเด็ก + เหตุการณ์ล่าสุด และทางลัดไปหน้า Teeth/Profile
 
 ### Teeth (ลำดับการขึ้นฟัน + บันทึกเหตุการณ์)
 
-- ไปที่ `GET /teeth`
-- เลือกแท็บ **ฟันน้ำนม / ฟันแท้**
+- ไปที่หน้าฟัน
+- เลือกแท็บ **ฟันน้ำนม**
 - เพิ่มเด็ก (ชื่อ + วันเกิด)
 - ดู timeline การขึ้นฟันตามช่วงอายุ (เดือนหลังคลอด)
 - บันทึก event:
@@ -175,21 +182,22 @@ docker compose down
 
 ### Profile
 
-- ไปที่ `GET /profile`
-- แก้ไขอีเมล แล้วกด **บันทึก** (อัปเดตลง MongoDB)
+- ไปที่หน้าโปรไฟล์
+- กรอกข้อมูลทันตแพทย์ และวันนัด แล้วกด **บันทึก** (อัปเดตลง MongoDB)
+- ประวัติการนัดทันตแพทย์
 
-## API Reference (ย่อ)
+## API Reference
 
-- `POST /api/register`
-- `GET /api/profile`
-- `PATCH /api/profile`
-- `GET /api/children`
-- `POST /api/children`
-- `PATCH /api/children/:id`
-- `DELETE /api/children/:id`
-- `GET /api/teeth`
-- `GET /api/teeth-events`
-- `POST /api/teeth-events`
+- `POST /api/register` : หน้าที่สมัครสมาชิก
+- `GET /api/profile` : หน้าที่ดึงข้อมูลโปรไฟล์
+- `PATCH /api/profile` : หน้าที่อัปเดตข้อมูลโปรไฟล์
+- `GET /api/children` : หน้าที่ดึงข้อมูลเด็ก
+- `POST /api/children` : หน้าที่เพิ่มข้อมูลเด็ก
+- `PATCH /api/children/:id` : หน้าที่อัปเดตข้อมูลเด็ก
+- `DELETE /api/children/:id` : หน้าที่ลบข้อมูลเด็ก
+- `GET /api/teeth` : หน้าที่ดึงข้อมูลฟัน
+- `GET /api/teeth-events` : หน้าที่ดึงข้อมูลเหตุการณ์ฟัน
+- `POST /api/teeth-events` : หน้าที่เพิ่มข้อมูลเหตุการณ์ฟัน
 
 ## Troubleshooting
 
@@ -209,5 +217,72 @@ docker compose down
 **EN**: This project uses `next/font` (Google Fonts). Builds may fail in environments without internet access.
 
 แนวทาง (Options):
+
 - รัน build ใน environment ที่ออกเน็ตได้
 - หรือเปลี่ยนไปใช้ local font ในอนาคต
+
+## Models
+
+- User : ใช้สำหรับจัดการข้อมูลผู้ใช้
+- Child : ใช้สำหรับจัดการข้อมูลเด็ก
+- Teeth : ใช้สำหรับจัดการข้อมูลฟัน
+- TeethEvent : ใช้สำหรับจัดการข้อมูลเหตุการณ์ฟัน
+
+### User Model
+
+| Field     | Type     | Description |
+| --------- | -------- | ----------- |
+| \_id      | ObjectId | Primary key |
+| username  | String   | Username    |
+| password  | String   | Password    |
+| email     | String   | Email       |
+| name      | String   | Name        |
+| phone     | String   | Phone       |
+| address   | String   | Address     |
+| city      | String   | City        |
+| state     | String   | State       |
+| zip       | String   | Zip         |
+| country   | String   | Country     |
+| role      | String   | Role        |
+| createdAt | Date     | Created at  |
+| updatedAt | Date     | Updated at  |
+
+### Child Model
+
+| Field     | Type     | Description |
+| --------- | -------- | ----------- |
+| \_id      | ObjectId | Primary key |
+| userId    | ObjectId | User ID     |
+| name      | String   | Name        |
+| birthDate | Date     | Birth date  |
+| gender    | String   | Gender      |
+| createdAt | Date     | Created at  |
+| updatedAt | Date     | Updated at  |
+
+### Teeth Model
+
+| Field         | Type     | Description    |
+| ------------- | -------- | -------------- |
+| \_id          | ObjectId | Primary key    |
+| childId       | ObjectId | Child ID       |
+| toothNumber   | String   | Tooth number   |
+| toothType     | String   | Tooth type     |
+| eruptedDate   | Date     | Erupted date   |
+| shedDate      | Date     | Shed date      |
+| extractedDate | Date     | Extracted date |
+| note          | String   | Note           |
+| createdAt     | Date     | Created at     |
+| updatedAt     | Date     | Updated at     |
+
+### TeethEvent Model
+
+| Field     | Type     | Description |
+| --------- | -------- | ----------- |
+| \_id      | ObjectId | Primary key |
+| childId   | ObjectId | Child ID    |
+| toothId   | ObjectId | Tooth ID    |
+| eventType | String   | Event type  |
+| eventDate | Date     | Event date  |
+| note      | String   | Note        |
+| createdAt | Date     | Created at  |
+| updatedAt | Date     | Updated at  |

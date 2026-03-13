@@ -51,12 +51,19 @@ function ageInMonths(birthday: string | Date | undefined) {
   if (Number.isNaN(b.getTime())) return null;
 
   const now = new Date();
-  let months = (now.getFullYear() - b.getFullYear()) * 12 + (now.getMonth() - b.getMonth());
+  let months =
+    (now.getFullYear() - b.getFullYear()) * 12 +
+    (now.getMonth() - b.getMonth());
   if (now.getDate() < b.getDate()) months -= 1;
   return Math.max(0, months);
 }
 
-type DeciduousLegendKey = 'CENTRAL' | 'LATERAL' | 'CANINE' | 'FIRST_MOLAR' | 'SECOND_MOLAR';
+type DeciduousLegendKey =
+  | 'CENTRAL'
+  | 'LATERAL'
+  | 'CANINE'
+  | 'FIRST_MOLAR'
+  | 'SECOND_MOLAR';
 type DeciduousLegend = {
   key: DeciduousLegendKey;
   label: string;
@@ -127,7 +134,11 @@ function getDeciduousLegendByCode(code: string): DeciduousLegend | null {
   }
 }
 
-export default function TeethPage({ params }: { params: Promise<{ id: string }> }) {
+export default function TeethPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const childId = (id || '').trim();
   const { data: session, status } = useSession();
@@ -157,7 +168,10 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
     return childrenList.find((c) => c._id === childId) || null;
   }, [childrenList, childId]);
 
-  const childAgeMonths = useMemo(() => ageInMonths(selectedChild?.birthday), [selectedChild?.birthday]);
+  const childAgeMonths = useMemo(
+    () => ageInMonths(selectedChild?.birthday),
+    [selectedChild?.birthday],
+  );
 
   const loadChildren = async () => {
     setLoadingChildren(true);
@@ -185,7 +199,8 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
     try {
       const res = await fetch('/api/teeth');
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || 'โหลดข้อมูลลำดับฟันไม่สำเร็จ');
+      if (!res.ok)
+        throw new Error(data?.error || 'โหลดข้อมูลลำดับฟันไม่สำเร็จ');
       setTeethList((data.teeth || []) as TeethDef[]);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'เกิดข้อผิดพลาด');
@@ -204,7 +219,9 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
     setLoadingEvents(true);
     setError(null);
     try {
-      const res = await fetch(`/api/teeth-events?childId=${encodeURIComponent(id)}&limit=100`);
+      const res = await fetch(
+        `/api/teeth-events?childId=${encodeURIComponent(id)}&limit=100`,
+      );
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'โหลดเหตุการณ์ไม่สำเร็จ');
       if (reqId !== eventsReqIdRef.current) return;
@@ -248,9 +265,9 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
   const pageBusy = loadingChildren || loadingTeeth || loadingEvents;
 
   return (
-    <div className="min-h-screen" >
+    <div className="min-h-screen">
       <Navbar session={session} />
-     <div style={{ backgroundColor: '#448575' }}>
+      <div style={{ backgroundColor: '#448575' }}>
         <div className="mx-auto max-w-6xl px-4 py-8 pb-24 lg:pb-10">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
@@ -258,9 +275,11 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
               <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
                 ลำดับการขึ้นฟัน & บันทึกเหตุการณ์
               </h1>
-              <p className="mt-2 text-sm text-white">เลือกเด็ก แล้วบันทึกเหตุการณ์เพื่อดูย้อนหลัง (ฟันน้ำนม)</p>
+              <p className="mt-2 text-sm text-white">
+                เลือกเด็ก แล้วบันทึกเหตุการณ์เพื่อดูย้อนหลัง (ฟันน้ำนม)
+              </p>
             </div>
-  
+
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -288,17 +307,21 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
               </button> */}
             </div>
           </div>
-  
+
           {status === 'loading' && (
             <div className="mt-6 rounded-2xl bg-white p-5 text-sm text-slate-600 ring-1 ring-black/5">
               กำลังตรวจสอบสถานะผู้ใช้...
             </div>
           )}
-  
+
           {status === 'unauthenticated' && (
             <div className="mt-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
-              <div className="text-lg font-extrabold tracking-tight text-slate-900">กรุณาเข้าสู่ระบบเพื่อใช้งานฟีเจอร์นี้</div>
-              <p className="mt-2 text-sm text-slate-600">เพื่อบันทึกข้อมูลเด็กและเหตุการณ์การขึ้นฟัน</p>
+              <div className="text-lg font-extrabold tracking-tight text-slate-900">
+                กรุณาเข้าสู่ระบบเพื่อใช้งานฟีเจอร์นี้
+              </div>
+              <p className="mt-2 text-sm text-slate-600">
+                เพื่อบันทึกข้อมูลเด็กและเหตุการณ์การขึ้นฟัน
+              </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <Link
                   href="/auth/login"
@@ -315,7 +338,7 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
               </div>
             </div>
           )}
-  
+
           {status === 'authenticated' && (
             <div className="mt-6 grid gap-6">
               {error && (
@@ -323,32 +346,39 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
                   {error}
                 </div>
               )}
-  
+
               <Child
                 childrenList={childrenList}
                 selectedChildId={childId}
-                onSelect={(id: string) => router.push(`/teeth/${encodeURIComponent(id)}`)}
+                onSelect={(id: string) =>
+                  router.push(`/teeth/${encodeURIComponent(id)}`)
+                }
                 onCreated={(child?: { _id?: string }) => {
                   void loadChildren();
-                  if (child?._id) router.push(`/teeth/${encodeURIComponent(child._id)}`);
+                  if (child?._id)
+                    router.push(`/teeth/${encodeURIComponent(child._id)}`);
                 }}
               />
-  
+
               {/* Teeth Monitoring */}
               <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
                 <div className="grid gap-5 lg:grid-cols-12 lg:items-center">
                   <div className="lg:col-span-5">
-                    <div className="text-sm font-semibold text-slate-500">Introduction</div>
+                    <div className="text-sm font-semibold text-slate-500">
+                      Introduction
+                    </div>
                     <h2 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">
                       <span className="bg-gradient-to-r from-teal-600 via-emerald-500 to-amber-400 bg-clip-text text-transparent">
                         ลำดับการขึ้นของฟันน้ำนม
                       </span>
                     </h2>
                     <p className="mt-2 text-sm leading-6 text-slate-600">
-                      อินโฟกราฟิกนี้ช่วยดู “ลำดับการขึ้นของฟันน้ำนม” โดยช่วงอายุเป็น
-                      <span className="font-semibold"> เดือนหลังคลอด</span> และเป็นค่าโดยประมาณ
+                      อินโฟกราฟิกนี้ช่วยดู “ลำดับการขึ้นของฟันน้ำนม”
+                      โดยช่วงอายุเป็น
+                      <span className="font-semibold"> เดือนหลังคลอด</span>{' '}
+                      และเป็นค่าโดยประมาณ
                     </p>
-  
+
                     <div className="mt-4 flex flex-wrap gap-2">
                       {(
                         [
@@ -366,13 +396,20 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
                             item.pillClass,
                           ].join(' ')}
                         >
-                          <span className={['h-2.5 w-2.5 rounded-sm', item.dotClass].join(' ')} />
-                          <span className="whitespace-nowrap">{item.label_th}</span>
+                          <span
+                            className={[
+                              'h-2.5 w-2.5 rounded-sm',
+                              item.dotClass,
+                            ].join(' ')}
+                          />
+                          <span className="whitespace-nowrap">
+                            {item.label_th}
+                          </span>
                         </span>
                       ))}
                     </div>
                   </div>
-  
+
                   <div className="lg:col-span-7">
                     <div className="relative overflow-hidden rounded-3xl bg-slate-50 ring-1 ring-slate-200">
                       <Image
@@ -385,12 +422,13 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
                       />
                     </div>
                     <p className="mt-2 text-xs text-slate-500">
-                      หมายเหตุ: ช่วงอายุอาจแตกต่างกันในเด็กแต่ละคน หากมีอาการผิดปกติควรปรึกษาทันตแพทย์
+                      หมายเหตุ: ช่วงอายุอาจแตกต่างกันในเด็กแต่ละคน
+                      หากมีอาการผิดปกติควรปรึกษาทันตแพทย์
                     </p>
                   </div>
                 </div>
               </section>
-  
+
               {/* Saved quadrants overview */}
               <div className="grid gap-6 lg:grid-cols-2">
                 <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
@@ -400,7 +438,7 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
                     events={events}
                   />
                 </section>
-    
+
                 <TeethEvent
                   childId={childId}
                   teethType={tab}
@@ -409,17 +447,22 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
                   onReload={() => loadEvents(childId)}
                 />
               </div>
-  
+
               <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <div className="text-sm font-semibold text-slate-500">Timeline</div>
+                    <div className="text-sm font-semibold text-slate-500">
+                      Timeline
+                    </div>
                     <h2 className="mt-1 text-lg font-extrabold tracking-tight text-slate-900">
-                      โครงสร้างลำดับการขึ้นฟัน ({tab === 'DECIDUOUS' ? 'ฟันน้ำนม' : 'ฟันแท้'})
+                      โครงสร้างลำดับการขึ้นฟัน (
+                      {tab === 'DECIDUOUS' ? 'ฟันน้ำนม' : 'ฟันแท้'})
                     </h2>
                     <p className="mt-1 text-sm text-slate-600">
                       ช่วงอายุโดยประมาณเป็น “เดือนหลังคลอด”
-                      {childAgeMonths !== null ? ` • อายุปัจจุบัน ~ ${childAgeMonths} เดือน` : ''}
+                      {childAgeMonths !== null
+                        ? ` • อายุปัจจุบัน ~ ${childAgeMonths} เดือน`
+                        : ''}
                     </p>
                   </div>
                   <button
@@ -433,14 +476,16 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
                     รีเฟรชข้อมูล
                   </button>
                 </div>
-  
+
                 <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {teethByTab
                     .filter((t) => {
                       const last = lastEventByTooth.get(t.code);
                       return (
                         last &&
-                        (last.type === 'ERUPTED' || last.type === 'SHED' || last.type === 'EXTRACTED')
+                        (last.type === 'ERUPTED' ||
+                          last.type === 'SHED' ||
+                          last.type === 'EXTRACTED')
                       );
                     })
                     .map((t) => {
@@ -453,20 +498,25 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
                             : last?.type === 'EXTRACTED'
                               ? 'ถอนแล้ว'
                               : 'ยังไม่บันทึก';
-  
+
                       const inWindow =
                         childAgeMonths !== null &&
                         childAgeMonths >= t.start_occurrence_month &&
                         childAgeMonths <= t.end_occurrence_month;
-  
-                      const deciduousLegend = tab === 'DECIDUOUS' ? getDeciduousLegendByCode(t.code) : null;
-  
+
+                      const deciduousLegend =
+                        tab === 'DECIDUOUS'
+                          ? getDeciduousLegendByCode(t.code)
+                          : null;
+
                       return (
                         <div
                           key={t.code}
                           className={[
                             'rounded-2xl p-4 ring-1 transition',
-                            inWindow ? 'bg-rose-50 ring-rose-100' : 'bg-white ring-slate-200 hover:shadow-sm',
+                            inWindow
+                              ? 'bg-rose-50 ring-rose-100'
+                              : 'bg-white ring-slate-200 hover:shadow-sm',
                             deciduousLegend ? deciduousLegend.ringClass : '',
                           ].join(' ')}
                         >
@@ -476,12 +526,21 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
                                 <span>{t.code}</span>
                                 {deciduousLegend && (
                                   <span className="inline-flex items-center gap-1.5">
-                                    <span className={['h-2.5 w-2.5 rounded-sm', deciduousLegend.dotClass].join(' ')} />
-                                    <span className="text-slate-500">{deciduousLegend.label}</span>
+                                    <span
+                                      className={[
+                                        'h-2.5 w-2.5 rounded-sm',
+                                        deciduousLegend.dotClass,
+                                      ].join(' ')}
+                                    />
+                                    <span className="text-slate-500">
+                                      {deciduousLegend.label}
+                                    </span>
                                   </span>
                                 )}
                               </div>
-                              <div className="mt-1 text-sm font-extrabold text-slate-900">{t.name_th}</div>
+                              <div className="mt-1 text-sm font-extrabold text-slate-900">
+                                {t.name_th}
+                              </div>
                             </div>
                             <span
                               className={[
@@ -496,33 +555,47 @@ export default function TeethPage({ params }: { params: Promise<{ id: string }> 
                               {statusText}
                             </span>
                           </div>
-  
+
                           <div className="mt-3 text-xs text-slate-600">
-                            ช่วงขึ้นโดยประมาณ: {t.start_occurrence_month}–{t.end_occurrence_month} เดือน
+                            ช่วงขึ้นโดยประมาณ: {t.start_occurrence_month}–
+                            {t.end_occurrence_month} เดือน
                           </div>
-  
-                          {tab === 'DECIDUOUS' && t.start_destory_month && t.end_destory_month && (
-                            <div className="mt-1 text-xs text-slate-600">
-                              ช่วงหลุด/เปลี่ยน: {t.start_destory_month}–{t.end_destory_month} เดือน
-                            </div>
-                          )}
-  
+
+                          {tab === 'DECIDUOUS' &&
+                            t.start_destory_month &&
+                            t.end_destory_month && (
+                              <div className="mt-1 text-xs text-slate-600">
+                                ช่วงหลุด/เปลี่ยน: {t.start_destory_month}–
+                                {t.end_destory_month} เดือน
+                              </div>
+                            )}
+
                           {inWindow && (
-                            <div className="mt-3 text-xs font-semibold text-rose-700">อยู่ในช่วงที่พบบ่อยสำหรับการขึ้นของซี่นี้</div>
+                            <div className="mt-3 text-xs font-semibold text-rose-700">
+                              อยู่ในช่วงที่พบบ่อยสำหรับการขึ้นของซี่นี้
+                            </div>
                           )}
                         </div>
                       );
                     })}
                 </div>
-  
-                {loadingTeeth && <div className="mt-4 text-sm text-slate-500">กำลังโหลดข้อมูลลำดับฟัน...</div>}
+
+                {loadingTeeth && (
+                  <div className="mt-4 text-sm text-slate-500">
+                    กำลังโหลดข้อมูลลำดับฟัน...
+                  </div>
+                )}
               </section>
-  
-              {pageBusy && <div className="text-center text-sm text-slate-500">กำลังโหลดข้อมูล...</div>}
+
+              {pageBusy && (
+                <div className="text-center text-sm text-slate-500">
+                  กำลังโหลดข้อมูล...
+                </div>
+              )}
             </div>
           )}
         </div>
-     </div>
+      </div>
 
       <MobileAppBar session={session} />
     </div>
