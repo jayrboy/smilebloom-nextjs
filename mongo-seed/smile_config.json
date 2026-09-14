@@ -1,0 +1,26 @@
+[
+  {
+    "key": "home",
+    "navLabel": "หน้าแรก",
+    "loginLabel": "ลงชื่อเข้าใช้",
+    "heroTitle": "Smilebloom",
+    "heroSubtitle": "เว็บแอปพลิเคชันช่วยบันทึกการเจริญเติบโตของฟันและสุขภาพฟัน\nเพื่อผู้ปกครองและคุณหนู",
+    "introTitle": "เว็บไซต์นี้เป็นส่วนหนึ่งของโครงการศึกษาความรอบรู้\nเฉพาะเรื่อง (senior project)\nนางสาว สุชนาธร สีสุขดี",
+    "featureTitle": "ฟีเจอร์หลัก",
+    "features": [
+      "ติดตามลำดับการขึ้นของฟันน้ำนม",
+      "อำนวยความสะดวกในการพบทันตแพทย์"
+    ],
+    "heroOverlayFrom": "#0f4f47",
+    "heroOverlayVia": "#225f51",
+    "heroOverlayTo": "#184c43",
+    "pageBackground": "#8DD7BF",
+    "featureBoxColor": "#448575",
+    "menuBackgroundColor": "#8DD7BF",
+    "menuTextColor": "#FFFFFF",
+    "imageSrc": "/home/love-home.png",
+    "imageAlt": "Smilebloom",
+    "createdAt": { "$date": "2026-09-14T00:00:00.000Z" },
+    "updatedAt": { "$date": "2026-09-14T00:00:00.000Z" }
+  }
+]

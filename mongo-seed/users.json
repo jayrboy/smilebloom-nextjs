@@ -1,0 +1,12 @@
+[
+  {
+    "username": "admin",
+    "password": "$2b$10$IPpFvHntP/AjbaaWWhU2qeV3/BfSK7KCmCqIDAFoABt.DZ1ygucR2",
+    "email": "admin@smilebloom.local",
+    "role": "ADMIN",
+    "status": "ACTIVE",
+    "dentistHistory": [],
+    "createdAt": { "$date": "2026-09-14T00:00:00.000Z" },
+    "updatedAt": { "$date": "2026-09-14T00:00:00.000Z" }
+  }
+]
