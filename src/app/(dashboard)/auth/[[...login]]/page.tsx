@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -47,7 +46,7 @@ const LoginPage = () => {
       });
 
       if (result?.error) {
-        setMessage('Invalid credentials');
+        setMessage('เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
         return;
       }
 
@@ -144,13 +143,12 @@ const LoginPage = () => {
                     />
                     จำฉันไว้
                   </label>
-                  <button
-                    type="button"
+                  <Link
+                    href="/forgot-password"
                     className="font-semibold text-slate-700 hover:text-slate-900"
-                    onClick={() => setMessage('ฟีเจอร์นี้ยังไม่พร้อมใช้งาน')}
                   >
                     ลืมรหัสผ่าน?
-                  </button>
+                  </Link>
                 </div>
 
                 {message && (
@@ -202,4 +200,5 @@ const LoginPage = () => {
     </div>
   );
 };
+
 export default LoginPage
