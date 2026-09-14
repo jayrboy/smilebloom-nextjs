@@ -143,12 +143,19 @@ const LoginPage = () => {
                     />
                     จำฉันไว้
                   </label>
-                  <Link
+                  <button
+                    type="button"
+                    className="font-semibold text-slate-700 hover:text-slate-900"
+                    onClick={() => setMessage('ฟีเจอร์นี้ยังไม่พร้อมใช้งาน')}
+                  >
+                    ลืมรหัสผ่าน?
+                  </button>
+                  {/* <Link
                     href="/forgot-password"
                     className="font-semibold text-slate-700 hover:text-slate-900"
                   >
                     ลืมรหัสผ่าน?
-                  </Link>
+                  </Link> */}
                 </div>
 
                 {message && (
