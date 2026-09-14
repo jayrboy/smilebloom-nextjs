@@ -7,29 +7,56 @@ import { useRouter } from 'next/navigation';
 import { GiHamburgerMenu } from "react-icons/gi"
 import { TbLogout } from "react-icons/tb";
 import Image from 'next/image';
+import { DEFAULT_SMILE_CONFIG, normalizeSmileConfig } from '@/src/lib/smileConfig';
 
 const Navbar = ({ session }) => {
   const [loading, setLoading] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [teethHref, setTeethHref] = useState('/dashboard');
+  const [config, setConfig] = useState(DEFAULT_SMILE_CONFIG);
   const router = useRouter();
 
   useEffect(() => {
     try {
       const lastChildId = localStorage.getItem('smilebloom:lastChildId');
-      if (lastChildId) setTeethHref(`/teeth/${encodeURIComponent(lastChildId)}`);
+      if (lastChildId) {
+        window.setTimeout(() => {
+          setTeethHref(`/teeth/${encodeURIComponent(lastChildId)}`);
+        }, 0);
+      }
     } catch {
       // ignore
     }
   }, []);
 
+  useEffect(() => {
+    let alive = true;
+    const loadConfig = async () => {
+      try {
+        const res = await fetch('/api/smile-config', { cache: 'no-store' });
+        const data = await res.json();
+        if (alive && res.ok) setConfig(normalizeSmileConfig(data?.config));
+      } catch {
+        if (alive) setConfig(DEFAULT_SMILE_CONFIG);
+      }
+    };
+    void loadConfig();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const navLinks = useMemo(() => {
-    return [
+    const links = [
       { href: '/dashboard', label: 'หน้าหลัก' },
       { href: teethHref, label: 'ฟันที่ต้องรักษา' },
       { href: '/profile', label: 'ข้อมูลส่วนตัว' },
     ];
-  }, [teethHref]);
+    if (session?.user?.role === 'ADMIN') {
+      links.push({ href: '/admin/settings', label: 'ตั้งค่า' });
+    }
+    return links;
+  }, [teethHref, session?.user?.role]);
 
   const handleLogout = async () => {
     setLoading(true);
@@ -52,19 +79,20 @@ const Navbar = ({ session }) => {
   return (
     <>
       <header className="sticky top-0 z-50">
-        <div className="backdrop-blur" style={{ backgroundColor: '#8DD7BF' }}>
+        <div className="backdrop-blur" style={{ backgroundColor: config.menuBackgroundColor }}>
           <div className="mx-auto max-w-6xl px-4">
             <div className="flex items-center justify-between gap-3 py-3">
               <button
                 type="button"
-                className="inline-flex items-center justify-center rounded-xl px-2 py-2 text-slate-700 hover:bg-slate-100 lg:hidden focus:outline-none"
+                className="inline-flex items-center justify-center rounded-xl px-2 py-2 hover:bg-white/20 lg:hidden focus:outline-none"
+                style={{ color: config.menuTextColor }}
                 aria-label="เปิดเมนู"
                 onClick={() => setMobileOpen((v) => !v)}
               >
                 <GiHamburgerMenu size={24} />
               </button>
 
-              <span className="text-xl font-extrabold tracking-tight text-white">
+              <span className="text-xl font-extrabold tracking-tight" style={{ color: config.menuTextColor }}>
                 Smilebloom
               </span>
               <Image src="/home/teeth_icon.png" alt="Smilebloom" width={120} height={44} className="h-9 w-auto" />
@@ -85,7 +113,8 @@ const Navbar = ({ session }) => {
                   <Link
                     key={`${item.label}-${item.href}`}
                     href={item.href}
-                    className="rounded-xl px-3 py-2 font-semibold text-white hover:bg-slate-100 hover:text-slate-900"
+                    className="rounded-xl px-3 py-2 font-semibold hover:bg-white/20"
+                    style={{ color: config.menuTextColor }}
                   >
                     {item.label}
                   </Link>

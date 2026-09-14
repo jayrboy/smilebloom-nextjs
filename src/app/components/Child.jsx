@@ -1,19 +1,10 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { formatThaiDate } from '@/src/lib/dateFormat';
 
 function formatDateInputValue(date) {
-  try {
-    const d = new Date(date);
-    if (Number.isNaN(d.getTime())) return '';
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${dd}-${mm}-${yyyy}`;
-
-  } catch {
-    return ''
-  }
+  return formatThaiDate(date);
 }
 
 const Child = ({ childrenList, selectedChildId, onSelect, onCreated }) => {

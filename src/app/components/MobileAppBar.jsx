@@ -5,15 +5,21 @@ import Link from 'next/link';
 import { MdDashboard } from "react-icons/md";
 import { GoPersonFill } from "react-icons/go";
 import { FaTeeth } from "react-icons/fa";
+import { IoSettingsSharp } from "react-icons/io5";
 
 const MobileAppBar = ({ session }) => {
   const isAuthed = Boolean(session?.user?.username);
+  const isAdmin = session?.user?.role === 'ADMIN';
   const [teethHref, setTeethHref] = useState('/dashboard');
 
   useEffect(() => {
     try {
       const lastChildId = localStorage.getItem('smilebloom:lastChildId');
-      if (lastChildId) setTeethHref(`/teeth/${encodeURIComponent(lastChildId)}`);
+      if (lastChildId) {
+        window.setTimeout(() => {
+          setTeethHref(`/teeth/${encodeURIComponent(lastChildId)}`);
+        }, 0);
+      }
     } catch {
       // ignore
     }
@@ -43,6 +49,15 @@ const MobileAppBar = ({ session }) => {
         >
           <GoPersonFill size={30} />
         </Link>
+        {isAdmin && (
+          <Link
+            href="/admin/settings"
+            className="flex flex-1 flex-col items-center justify-center rounded-xl py-2 px-0 text-center hover:bg-slate-100 transition-colors"
+            tabIndex={0}
+          >
+            <IoSettingsSharp size={30} />
+          </Link>
+        )}
       </div>
     </nav>
   );

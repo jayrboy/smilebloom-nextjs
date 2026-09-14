@@ -2,66 +2,55 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { GiHamburgerMenu } from "react-icons/gi"
+import { DEFAULT_SMILE_CONFIG, normalizeSmileConfig, type SmileConfig } from '@/src/lib/smileConfig';
 
 type NavItem = { label: string; href: `#${string}` };
-
-const NAV_ITEMS: NavItem[] = [
-  { label: 'หน้าแรก', href: '#home' },
-  // { label: 'บริการ', href: '#services' },
-  // { label: 'เวลาทำการ', href: '#hours' },
-  // { label: 'ติดต่อ', href: '#contact' },
-  // { label: 'เกี่ยวกับเรา', href: '#about' },
-];
 
 function scrollToId(id: string) {
   const el = document.getElementById(id);
   el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function ImageCard({
-  src,
-  alt,
-  aspect = 'aspect-[4/3]',
-}: {
-  src: string;
-  alt: string;
-  aspect?: string;
-}) {
-  const [failed, setFailed] = useState(false);
-
-  return (
-    <div
-      className={[
-        'relative overflow-hidden rounded-2xl bg-slate-100 shadow-sm ring-1 ring-black/5',
-        aspect,
-      ].join(' ')}
-    >
-      {!failed ? (
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          sizes="(max-width: 1024px) 100vw, 50vw"
-          className="object-cover"
-          onError={() => setFailed(true)}
-        />
-      ) : (
-        <div className="grid h-full w-full place-items-center bg-gradient-to-br from-slate-100 to-slate-200 text-sm text-slate-500">
-          รูปภาพยังไม่พร้อมใช้งาน
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function HomePage() {
   const [query, setQuery] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [config, setConfig] = useState<SmileConfig>(DEFAULT_SMILE_CONFIG);
+
+  useEffect(() => {
+    let alive = true;
+    const loadConfig = async () => {
+      try {
+        const res = await fetch('/api/smile-config', { cache: 'no-store' });
+        const data = (await res.json()) as { config?: Partial<SmileConfig> };
+        if (alive && res.ok) setConfig(normalizeSmileConfig(data.config));
+      } catch {
+        if (alive) setConfig(DEFAULT_SMILE_CONFIG);
+      }
+    };
+    void loadConfig();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const navItems = useMemo<NavItem[]>(
+    () => [{ label: config.navLabel, href: '#home' }],
+    [config.navLabel]
+  );
+
+  const heroSubtitleLines = useMemo(
+    () => config.heroSubtitle.split('\n').filter(Boolean),
+    [config.heroSubtitle]
+  );
+  const introTitleLines = useMemo(
+    () => config.introTitle.split('\n').filter(Boolean),
+    [config.introTitle]
+  );
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={{ backgroundColor: config.pageBackground }}>
       {/* Navbar */}
       <header className="sticky top-0 z-50">
         {/* Topbar */}
@@ -122,7 +111,7 @@ export default function HomePage() {
               </a> */}
 
               <nav className="hidden items-center gap-6 text-base font-semibold text-white lg:flex">
-                {NAV_ITEMS.map((item) => (
+                {navItems.map((item) => (
                   <a
                     key={item.href}
                     href={item.href}
@@ -161,7 +150,7 @@ export default function HomePage() {
                   href="/auth/login"
                   className="rounded-full px-4 py-2 text-base font-semibold text-white ring-1 ring-slate-200 hover:bg-teal-800"
                 >
-                  ลงชื่อเข้าใช้
+                  {config.loginLabel}
                 </Link>
               </div>
             </div>
@@ -193,7 +182,7 @@ export default function HomePage() {
                   </form>
 
                   <div className="mt-3 grid gap-2 text-sm">
-                    {NAV_ITEMS.map((item) => (
+                    {navItems.map((item) => (
                       <a
                         key={item.href}
                         href={item.href}
@@ -227,18 +216,26 @@ export default function HomePage() {
               className="object-cover object-center"
             />
           </div> */}
-          <div className="absolute inset-0 bg-gradient-to-br from-teal-950/70 via-emerald-950/60 to-teal-950/75" />
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(135deg, ${config.heroOverlayFrom}, ${config.heroOverlayVia}, ${config.heroOverlayTo})`,
+            }}
+          />
           <div className="absolute inset-0 opacity-25 [background:radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.55),transparent_45%),radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.35),transparent_40%)]" />
 
           <div className="relative z-10 mx-auto max-w-6xl px-4 py-16 sm:py-20">
             <div className="mx-auto max-w-2xl text-center text-white">
               <h1 className="text-balance text-3xl font-extrabold tracking-tight sm:text-5xl">
-                Smilebloom
+                {config.heroTitle}
               </h1>
               <h2 className="mt-4 text-white">
-                เว็บแอปพลิเคชันช่วยบันทึกการเจริญเติบโตของฟันและสุขภาพฟัน
-                <br className="hidden sm:block" />
-                เพื่อผู้ปกครองและคุณหนู
+                {heroSubtitleLines.map((line, idx) => (
+                  <span key={`${line}-${idx}`}>
+                    {line}
+                    {idx < heroSubtitleLines.length - 1 && <br className="hidden sm:block" />}
+                  </span>
+                ))}
               </h2>
             </div>
           </div>
@@ -252,32 +249,33 @@ export default function HomePage() {
           <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
             <div className="lg:col-span-6">
               <h2 className="text-2xl font-extrabold tracking-tight text-white text-center">
-                เว็บไซต์นี้เป็นส่วนหนึ่งของโครงการศึกษาความรอบรู้<br/>
-                เฉพาะเรื่อง (senior project)<br/>
-                นางสาว สุชนาธร สีสุขดี
+                {introTitleLines.map((line, idx) => (
+                  <span key={`${line}-${idx}`}>
+                    {line}
+                    {idx < introTitleLines.length - 1 && <br />}
+                  </span>
+                ))}
               </h2>
               {/* <p className="mt-4 text-sm leading-7 text-slate-600">
                 สร้างสรรค์เว็บแอปสำหรับติดตามลำดับการขึ้นของฟันน้ำนมและบันทึกเหตุการณ์ล่าสุด
               </p> */}
 
-              <div className="mt-6 rounded-2xl p-5" style={{ backgroundColor: '#448575' }}>
-                <p className="text-sm font-semibold text-white">ฟีเจอร์หลัก</p>
+              <div className="mt-6 rounded-2xl p-5" style={{ backgroundColor: config.featureBoxColor }}>
+                <p className="text-sm font-semibold text-white">{config.featureTitle}</p>
                 <ul className="mt-3 space-y-2 text-sm text-white">
-                  <li className="flex gap-2">
-                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-white" />
-                    ติดตามลำดับการขึ้นของฟันน้ำนม
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-white" />
-                    อำนวยความสะดวกในการพบทันตแพทย์
-                  </li>
+                  {config.features.map((feature) => (
+                    <li key={feature} className="flex gap-2">
+                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-white" />
+                      {feature}
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
 
             <div className="lg:col-span-6">
               <div className="grid gap-4 sm:grid-cols-1">
-                <Image src="/home/love-home.png" alt="ทีมแพทย์และการให้บริการ" width={1200} height={650} />
+                <Image src={config.imageSrc} alt={config.imageAlt} width={1200} height={650} />
               </div>
               {/* <div className="grid gap-4 sm:grid-cols-2">
                 <ImageCard src="https://img5.pic.in.th/file/secure-sv1/teeth-bg1.jpg" alt="ทีมแพทย์และการให้บริการ" />

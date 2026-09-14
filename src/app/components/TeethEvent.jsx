@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { formatThaiDate } from '@/src/lib/dateFormat';
 
 function formatIsoDateInput(date) {
   const d = new Date(date);
@@ -192,7 +193,7 @@ const TeethEvent = ({ childId, teethType, teethList, events, onReload }) => {
             <div className="bg-white px-4 py-5 text-sm text-slate-500">ยังไม่มีเหตุการณ์</div>
           ) : (
             (events || []).map((ev, idx) => {
-              const dateText = formatIsoDateInput(ev.eventDate || ev.createdAt || new Date());
+              const dateText = formatThaiDate(ev.eventDate || ev.createdAt || new Date());
               const tooth = ev.toothCode ? toothByCode.get(ev.toothCode) : null;
               return (
                 <div

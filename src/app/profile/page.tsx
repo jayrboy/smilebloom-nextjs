@@ -5,6 +5,7 @@ import Navbar from '@/src/app/components/Navbar';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import MobileAppBar from '@/src/app/components/MobileAppBar';
+import { formatThaiDate, formatThaiDateTime } from '@/src/lib/dateFormat';
 
 type ProfileUser = {
   _id: string;
@@ -23,18 +24,6 @@ type ProfileUser = {
   updatedAt?: string;
 };
 
-function formatDateTime(value?: string) {
-  if (!value) return '-';
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return '-';
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  const hh = String(d.getHours()).padStart(2, '0');
-  const mi = String(d.getMinutes()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
-}
-
 function diffDaysFromTodayDateOnly(dateOnly: string) {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateOnly);
   if (!m) return null;
@@ -51,7 +40,6 @@ function diffDaysFromTodayDateOnly(dateOnly: string) {
 
 const ProfilePage = () => {
   const { data: session, status } = useSession();
-  const username = session?.user?.username;
 
   const [user, setUser] = useState<ProfileUser | null>(null);
   const [loading, setLoading] = useState(false);
@@ -226,7 +214,7 @@ const ProfilePage = () => {
                     <div className="flex items-center justify-between gap-3">
                       <span className="text-slate-500">Updated</span>
                       <span className="font-semibold text-slate-700">
-                        {formatDateTime(user?.updatedAt)}
+                        {formatThaiDateTime(user?.updatedAt)}
                       </span>
                     </div>
                   </div>
@@ -330,10 +318,10 @@ const ProfilePage = () => {
                             >
                               <div className="flex flex-wrap items-center justify-between gap-2">
                                 <div className="font-semibold text-slate-900">
-                                  {h.dentistDay}{' '}
+                                  {formatThaiDate(h.dentistDay) || h.dentistDay}{' '}
                                   <span className="font-normal text-slate-500">({relative})</span>
                                 </div>
-                                <div className="text-xs text-slate-500">{formatDateTime(h.savedAt)}</div>
+                                <div className="text-xs text-slate-500">{formatThaiDateTime(h.savedAt)}</div>
                               </div>
                               <div className="mt-1 text-xs text-slate-600">
                                 ทัตแพทย์ประจำ: <span className="font-semibold text-slate-700">{h.dentistName || '-'}</span>
